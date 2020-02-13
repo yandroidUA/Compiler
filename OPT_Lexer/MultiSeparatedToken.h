@@ -2,25 +2,15 @@
 class MultiSeparatedToken
 {
 public:
-	MultiSeparatedToken(int, int);
+	MultiSeparatedToken(int _code, int _pairCode) {
+		code = _code;
+		pairCode = _pairCode;
+	}
 
-	int getCode();
-	int getPairCode();
+	inline int getCode() { return code; }
+	inline int getPairCode() { return pairCode; }
 
 private:
 	int code;
 	int pairCode;
 };
-
-MultiSeparatedToken::MultiSeparatedToken(int code, int pairCode) {
-	this->code = code;
-	this->pairCode = pairCode;
-}
-
-inline int MultiSeparatedToken::getCode() {
-	return code;
-}
-
-inline int MultiSeparatedToken::getPairCode(){
-	return pairCode;
-}

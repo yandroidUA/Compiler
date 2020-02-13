@@ -32,7 +32,7 @@ bool Lexer::isLetter(int character) {
 
 bool Lexer::isNumber(int character) {
 	for (auto& number : numbersVector) {
-		if (number == character) {
+		if ((char) number == character) {
 			return true;
 		}
 	}
@@ -79,6 +79,8 @@ void Lexer::resetTokenStatus() {
 	currentTokenState[0] = 0;
 	currentTokenState[1] = 0;
 	currentTokenState[2] = 0;
+	currentTokenState[3] = 0;
+	currentTokenState[4] = 0;
 }
 
 Lexer::Lexer() {
@@ -199,6 +201,7 @@ void Lexer::analyzeLetter(int letter, std::ifstream &file) {
 	if (isOneSeparated(letter) && currentTokenState[TOKEN_STATUS_MULTI_SEPARATED_TOKEN] == 0) {
 		if (!token.empty()) {
 			addToken(token);
+			token = "";
 		}
 		resetTokenStatus();
 		currentTokenState[TOKEN_STATUS_ONE_SEPARATED_TOKEN] = 1;
@@ -213,13 +216,21 @@ void Lexer::analyzeLetter(int letter, std::ifstream &file) {
 	}
 		 
 	if (isNumber(letter)) {
+
+		if (currentTokenState[TOKEN_STATUS_MULTI_SEPARATED_TOKEN] == 1 || currentTokenState[TOKEN_STATUS_ONE_SEPARATED_TOKEN] == 1) {
+			if (!token.empty()) {
+				addToken(token);
+				token = "";
+			}
+			resetTokenStatus();
+		}
+
 		if (currentTokenState[TOKEN_STATUS_IDENTIFIER] != 1) {
 			resetTokenStatus();
 			currentTokenState[TOKEN_STATUS_CONSTANT] = 1;
 		} else {
 			currentTokenState[TOKEN_STATUS_RESERVED_WORD] = 0;
 		}
-
 	}
 
 	if (isLetter(letter)) {
@@ -227,6 +238,15 @@ void Lexer::analyzeLetter(int letter, std::ifstream &file) {
 			std::cout << "Error constant cannot contains letter" << std::endl;
 			return;
 		}
+
+		if (currentTokenState[TOKEN_STATUS_MULTI_SEPARATED_TOKEN] == 1 || currentTokenState[TOKEN_STATUS_ONE_SEPARATED_TOKEN] == 1) {
+			if (!token.empty()) {
+				addToken(token);
+				token = "";
+			}
+			resetTokenStatus();
+		}
+
 		currentTokenState[TOKEN_STATUS_IDENTIFIER] = 1;
 		currentTokenState[TOKEN_STATUS_RESERVED_WORD] = 1;
 	}
@@ -234,9 +254,9 @@ void Lexer::analyzeLetter(int letter, std::ifstream &file) {
 	if (isWhiteSpace(letter)) {
 		if (!token.empty()) {
 			addToken(token);
-			resetTokenStatus();
 			token = "";
 		}
+		resetTokenStatus();
 	} else {
 		token += (char)letter;
 	}

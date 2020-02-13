@@ -10,9 +10,9 @@ private:
 	std::vector<int> lettersVector = {
 		'a', 'A', 'b', 'B', 'c', 'C', 'd', 'D', 'e', 'E', 'f', 'F', 'g', 'G', 'h', 'H',
 		'k', 'K', 'l', 'L', 'm', 'M', 'n', 'N', 'o', 'O', 'p', 'P', 'q', 'Q', 'r', 'R',
-		's', 'S', 't', 'T', 'u', 'U', 'v', 'V', 'w', 'W', 'x', 'X', 'y', 'y', 'z', 'Z'
+		's', 'S', 't', 'T', 'u', 'U', 'v', 'V', 'w', 'W', 'x', 'X', 'y', 'y', 'z', 'Z', 'i', 'I'
 	};
-	std::vector<int> numbersVector = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+	std::vector<int> numbersVector = {48, 49, 50, 51, 52, 53, 54, 55, 56, 57};
 	std::vector<int> whiteSpacesVector = {9, 10, 13, 32};
 	std::vector<int> oneSeparatedTokens = {':', ';'};
 	std::vector<MultiSeparatedToken> multiSeparatedTokens = {
