@@ -1,0 +1,6 @@
+﻿  Lexer.cpp
+C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(246,30): warning C4805: !=: небезопасное смешение типа "int" и типа "bool" в операции
+  OPT_Lexer.cpp
+  Создание кода...
+OPT_Lexer.obj : error LNK2005: "public: __thiscall MultiSeparatedToken::MultiSeparatedToken(int,int)" (??0MultiSeparatedToken@@QAE@HH@Z) уже определен в Lexer.obj
+C:\Users\yanec\source\repos\OPT_Lexer\Debug\OPT_Lexer.exe : fatal error LNK1169: обнаружен многократно определенный символ - один или более

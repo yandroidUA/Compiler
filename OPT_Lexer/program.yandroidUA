@@ -1,0 +1,13 @@
+PROGRAM PR;
+	VAR A:INTEGER;
+	VAR C 0 .. 10;
+	VAR B:FLOAT;
+BEGIN
+	A:=10;
+	LOOP 
+		C:=0;
+		A:=C;
+		A:=C[A];
+		A:=C[1];
+	ENDLOOP;
+END.
