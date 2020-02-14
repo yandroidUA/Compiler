@@ -9,6 +9,7 @@ int TOKEN_STATUS_IDENTIFIER = 1;
 int TOKEN_STATUS_RESERVED_WORD = 2;
 int TOKEN_STATUS_ONE_SEPARATED_TOKEN = 3;
 int TOKEN_STATUS_MULTI_SEPARATED_TOKEN = 4;
+int TOKEN_STATUS_COMMENT = 5;
 
 int oneSymbolTokenIndex = 0;
 int multiSymbolTokenIndex = 301;
@@ -18,8 +19,10 @@ int variablesIndex = 1001;
 
 int savedMultiSeparatedToken = -1;
 
-int currentTokenState[5] = {0, 0, 0, 0, 0};
+int currentTokenState[6] = {0, 0, 0, 0, 0, 0};
 std::string token = "";
+
+int currentLetter = -1;
 
 bool Lexer::isLetter(int character) {
 	for (auto& c : lettersVector) {
@@ -81,6 +84,7 @@ void Lexer::resetTokenStatus() {
 	currentTokenState[2] = 0;
 	currentTokenState[3] = 0;
 	currentTokenState[4] = 0;
+	currentTokenState[5] = 0;
 }
 
 Lexer::Lexer() {
@@ -122,6 +126,11 @@ void Lexer::addToken(std::string&) {
 
 	if (currentTokenState[TOKEN_STATUS_MULTI_SEPARATED_TOKEN] == 1) {
 		std::cout << token << " is multi separated word" << std::endl;
+		return;
+	}
+
+	if (currentTokenState[TOKEN_STATUS_COMMENT] == 1) {
+		std::cout << token << " is comment" << std::endl;
 		return;
 	}
 
@@ -178,15 +187,6 @@ int Lexer::isTokenMultiSeparatedToken(std::string& word) {
 	return -1;
 }
 
-void Lexer::scanFile(const char* filePath) {
-	std::ifstream file;
-
-	file.open(filePath, std::ios::in);
-	int letter = readCharacterFromFile(file);
-	analyzeLetter(letter, file);
-	file.close();
-}
-
 int Lexer::readCharacterFromFile(std::ifstream &file) {
 	char currentCaracter = file.eof();
 	if (!file.eof()) {
@@ -196,74 +196,163 @@ int Lexer::readCharacterFromFile(std::ifstream &file) {
 	return (int)currentCaracter;
 }
 
-void Lexer::analyzeLetter(int letter, std::ifstream &file) {
-
-	if (isOneSeparated(letter) && currentTokenState[TOKEN_STATUS_MULTI_SEPARATED_TOKEN] == 0) {
-		if (!token.empty()) {
-			addToken(token);
-			token = "";
-		}
-		resetTokenStatus();
-		currentTokenState[TOKEN_STATUS_ONE_SEPARATED_TOKEN] = 1;
-		if (isMultiSeparated(letter)) {
-			currentTokenState[TOKEN_STATUS_MULTI_SEPARATED_TOKEN] = 1;
-			savedMultiSeparatedToken = letter;
-		}
-	}
-
-	if (savedMultiSeparatedToken != -1 && isSecondPartOfMultiSeparated(savedMultiSeparatedToken, letter) && currentTokenState[TOKEN_STATUS_MULTI_SEPARATED_TOKEN] == 1) {
-		currentTokenState[TOKEN_STATUS_ONE_SEPARATED_TOKEN] = 0;
-	}
-		 
-	if (isNumber(letter)) {
-
-		if (currentTokenState[TOKEN_STATUS_MULTI_SEPARATED_TOKEN] == 1 || currentTokenState[TOKEN_STATUS_ONE_SEPARATED_TOKEN] == 1) {
-			if (!token.empty()) {
-				addToken(token);
-				token = "";
-			}
-			resetTokenStatus();
-		}
-
-		if (currentTokenState[TOKEN_STATUS_IDENTIFIER] != 1) {
-			resetTokenStatus();
-			currentTokenState[TOKEN_STATUS_CONSTANT] = 1;
-		} else {
-			currentTokenState[TOKEN_STATUS_RESERVED_WORD] = 0;
-		}
-	}
-
-	if (isLetter(letter)) {
-		if (currentTokenState[TOKEN_STATUS_CONSTANT] == 1) {
-			std::cout << "Error constant cannot contains letter" << std::endl;
-			return;
-		}
-
-		if (currentTokenState[TOKEN_STATUS_MULTI_SEPARATED_TOKEN] == 1 || currentTokenState[TOKEN_STATUS_ONE_SEPARATED_TOKEN] == 1) {
-			if (!token.empty()) {
-				addToken(token);
-				token = "";
-			}
-			resetTokenStatus();
-		}
-
-		currentTokenState[TOKEN_STATUS_IDENTIFIER] = 1;
-		currentTokenState[TOKEN_STATUS_RESERVED_WORD] = 1;
-	}
-
-	if (isWhiteSpace(letter)) {
-		if (!token.empty()) {
-			addToken(token);
-			token = "";
-		}
-		resetTokenStatus();
-	} else {
-		token += (char)letter;
-	}
-
+int Lexer::caseMultiSeparated(int letter, std::ifstream& file) {
+	token = (char)letter;
 	
-	int nextLetter = readCharacterFromFile(file);
-	if (nextLetter != file.eof()) {
-		analyzeLetter(nextLetter, file);
+	while (!file.eof()) {
+		int nextLetter = readCharacterFromFile(file);
+		if (isSecondPartOfMultiSeparated(letter, nextLetter)) {
+			currentTokenState[TOKEN_STATUS_MULTI_SEPARATED_TOKEN] = 1;
+			currentTokenState[TOKEN_STATUS_ONE_SEPARATED_TOKEN] = 0;
+			token += (char)nextLetter;
+		} else {
+			if (!token.empty()) {
+				addToken(token);
+			}
+			token = "";
+			resetTokenStatus();
+			return nextLetter;
+		}
 	}
+}
+
+int Lexer::caseOneSeparated(int letter, std::ifstream& file) {
+	resetTokenStatus();
+	currentTokenState[TOKEN_STATUS_ONE_SEPARATED_TOKEN] = 1;
+	while (!file.eof()) {
+		if (isMultiSeparated(letter)) {
+			return caseMultiSeparated(letter, file);
+		} else {
+			token = (char)letter;
+			if (!token.empty()) {
+				addToken(token);
+			}
+			token = "";
+			resetTokenStatus();
+			return readCharacterFromFile(file);
+		}
+	}
+}
+
+int Lexer::caseLetter(int letter, std::ifstream& file) {
+	token = (char)letter;
+	currentTokenState[TOKEN_STATUS_IDENTIFIER] = 1;
+	currentTokenState[TOKEN_STATUS_RESERVED_WORD] = 1;
+
+	while (!file.eof()) {
+		int nextLetter = readCharacterFromFile(file);
+
+		if (isNumber(nextLetter)) {
+			currentTokenState[TOKEN_STATUS_IDENTIFIER] = 1;
+			token += (char)nextLetter;
+			continue;
+		}
+
+		if (!isLetter(nextLetter)) {
+			if (!token.empty()) {
+				addToken(token);
+			}
+			token = "";
+			resetTokenStatus();
+			return nextLetter;
+		}
+
+		token += (char)nextLetter;
+	}
+}
+
+int Lexer::caseNumber(int letter, std::ifstream& file) {
+	currentTokenState[TOKEN_STATUS_CONSTANT] = 1;
+	token = (char)letter;
+
+	while (!file.eof()) {
+		int nextLetter = readCharacterFromFile(file);
+		if (!isNumber(nextLetter)) {
+			if (!token.empty()) {
+				addToken(token);
+			}
+			token = "";
+			resetTokenStatus();
+			return nextLetter;
+		}
+
+		token += (char)nextLetter;
+	}
+}
+
+int Lexer::caseComment(int letter, std::ifstream& file) {
+	resetTokenStatus();
+	currentTokenState[TOKEN_STATUS_COMMENT] = 1;
+	token = (char)letter;
+	bool isStartFound = false;
+
+	int nextLetter = readCharacterFromFile(file);
+
+	if (nextLetter != '*') {
+		std::cout << "Error comment must start with '(*'" << std::endl;
+		return nextLetter;
+	}
+	else {
+		token += (char)nextLetter;
+	}
+
+	while (!file.eof()) {
+		nextLetter = readCharacterFromFile(file);
+
+		if (nextLetter == '*') {
+			isStartFound = true;
+		} else if (nextLetter == ')' && isStartFound) {
+			token += (char)nextLetter;
+			addToken(token);
+			token = "";
+			resetTokenStatus();
+			return readCharacterFromFile(file);
+		} else {
+			isStartFound = false;
+		}
+
+		token += (char)nextLetter;
+
+	}
+
+}
+
+bool Lexer::isComment(int letter) {
+	return letter == '(';
+}
+
+void Lexer::scanFileNotRecyrsivly(const char* filePath) {
+	std::ifstream file;
+
+	file.open(filePath, std::ios::in);
+
+	while (!file.eof()) {
+		int letter = readCharacterFromFile(file);
+
+		if (isLetter(letter)) {
+			letter = caseLetter(letter, file);
+		}
+
+		if (isNumber(letter)) {
+			letter = caseNumber(letter, file);
+		}
+
+		if (isComment(letter)) {
+			letter = caseComment(letter, file);
+		}
+
+		if (isOneSeparated(letter)) {
+			letter = caseOneSeparated(letter, file);
+		}
+
+		if (isWhiteSpace(letter)) {
+			if (!token.empty()) {
+				addToken(token);
+			}
+			token = "";
+			resetTokenStatus();
+		}
+
+	}
+
 }

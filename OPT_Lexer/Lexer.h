@@ -29,6 +29,7 @@ private:
 	bool isOneSeparated(int);
 	bool isMultiSeparated(int);
 	bool isSecondPartOfMultiSeparated(int, int);
+	bool isComment(int);
 
 	void resetTokenStatus();
 	void addToken(std::string&);
@@ -40,13 +41,19 @@ private:
 	int isTokenOneSeparatedToken(std::string&);
 	int isTokenMultiSeparatedToken(std::string&);
 
-	void analyzeLetter(int, std::ifstream&);
 	int readCharacterFromFile(std::ifstream&);
+
+	// each of this methods will return ASCII code of letter that don't match case
+	int caseOneSeparated(int, std::ifstream&);
+	int caseMultiSeparated(int, std::ifstream&);
+	int caseLetter(int, std::ifstream&);
+	int caseNumber(int, std::ifstream&);
+	int caseComment(int, std::ifstream&);
 
 public:
 
 	Lexer();
 
-	void scanFile(const char* filePath);
+	void scanFileNotRecyrsivly(const char*);
 };
 

@@ -1,3 +1,7 @@
 ﻿  Lexer.cpp
-C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(266,30): warning C4805: !=: небезопасное смешение типа "int" и типа "bool" в операции
+C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(217): warning C4715: Lexer::caseMultiSeparated: значение возвращается не при всех путях выполнения
+C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(235): warning C4715: Lexer::caseOneSeparated: значение возвращается не при всех путях выполнения
+C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(262): warning C4715: Lexer::caseLetter: значение возвращается не при всех путях выполнения
+C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(281): warning C4715: Lexer::caseNumber: значение возвращается не при всех путях выполнения
+C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(318): warning C4715: Lexer::caseComment: значение возвращается не при всех путях выполнения
   OPT_Lexer.vcxproj -> C:\Users\yanec\source\repos\OPT_Lexer\Debug\OPT_Lexer.exe

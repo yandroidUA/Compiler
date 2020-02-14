@@ -5,7 +5,6 @@
 #include "Lexer.h"
 
 int main() {
-    std::cout << "Hello World!\n";
     Lexer lexer;
-    lexer.scanFile("program.yandroidUA");
+    lexer.scanFileNotRecyrsivly("program.yandroidUA");
 }

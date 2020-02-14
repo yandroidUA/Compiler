@@ -2,6 +2,11 @@ PROGRAM PR;
 	VAR A:INTEGER;
 	VAR C 0 .. 10;
 	VAR B:FLOAT;
+	(*LOLOASDASKLDASDJALKSDJALKDLAKJdLASKdj****U*ASKDJAKSDHAD**ASDLJK*)
+	(*BEGIN asdasd
+	adlaskd;laskdla
+	alskdalskdjak
+	**********)
 BEGIN
 	A:=10;
 	LOOP 
