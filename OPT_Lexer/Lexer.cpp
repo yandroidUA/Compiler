@@ -17,12 +17,13 @@ int reservedWordsIndex = 401;
 int constantsIndex = 501;
 int variablesIndex = 1001;
 
-int savedMultiSeparatedToken = -1;
-
 int currentTokenState[6] = {0, 0, 0, 0, 0, 0};
 std::string token = "";
 
-int currentLetter = -1;
+int currentColumn = -1;
+int currentRow = 0;
+int savedColumn = currentColumn;
+int savedRow = currentRow;
 
 bool Lexer::isLetter(int character) {
 	for (auto& c : lettersVector) {
@@ -95,51 +96,51 @@ Lexer::Lexer() {
 	addReservedWord("FLOAT");
 	addReservedWord("LOOP");
 	addReservedWord("ENDLOOP");
-	addReservedWord("..");
 
 	addOneSeparatedToken(":");
 	addOneSeparatedToken(";");
 	
 	addMultiSeparatedToken(":=");
+	addMultiSeparatedToken("..");
 }
 
 void Lexer::addToken(std::string&) {
 	if (currentTokenState[TOKEN_STATUS_CONSTANT] == 1) {
-		std::cout << token << " is constant" << std::endl;
+		std::cout << token << " is constant, row=" << savedRow << " column=" << savedColumn << std::endl;
 		return;
 	}
 
 	if (currentTokenState[TOKEN_STATUS_IDENTIFIER] == 1 && currentTokenState[TOKEN_STATUS_RESERVED_WORD] == 0) {
-		std::cout << token << " is identifier" << std::endl;
+		std::cout << token << " is identifier, row=" << savedRow << " column=" << savedColumn << std::endl;
 		return;
 	}
 
 	if (currentTokenState[TOKEN_STATUS_RESERVED_WORD] == 1 && currentTokenState[TOKEN_STATUS_IDENTIFIER] == 0) {
-		std::cout << token << " is reserved word" << std::endl;
+		std::cout << token << " is reserved word, row=" << savedRow << " column=" << savedColumn << std::endl;
 		return;
 	}
 
 	if (currentTokenState[TOKEN_STATUS_ONE_SEPARATED_TOKEN] == 1) {
-		std::cout << token << " is one separated word" << std::endl;
+		std::cout << token << " is one separated word, row=" << savedRow << " column=" << savedColumn << std::endl;
 		return;
 	}
 
 	if (currentTokenState[TOKEN_STATUS_MULTI_SEPARATED_TOKEN] == 1) {
-		std::cout << token << " is multi separated word" << std::endl;
+		std::cout << token << " is multi separated word, row=" << savedRow << " column=" << savedColumn << std::endl;
 		return;
 	}
 
 	if (currentTokenState[TOKEN_STATUS_COMMENT] == 1) {
-		std::cout << token << " is comment" << std::endl;
+		std::cout << token << " is comment, row=" << savedRow << " column=" << savedColumn << std::endl;
 		return;
 	}
 
 	int reservedWordCode = isTokenReservedWord(token);
 	if (reservedWordCode != -1) {
-		std::cout << token << " is reserved word" << std::endl;
+		std::cout << token << " is reserved word, row=" << savedRow << "column=" << savedColumn << std::endl;
 		return;
 	} else {
-		std::cout << token << " is identifier" << std::endl;
+		std::cout << token << " is identifier, row=" << savedRow << "column=" << savedColumn << std::endl;
 		return;
 	}
 
@@ -191,13 +192,14 @@ int Lexer::readCharacterFromFile(std::ifstream &file) {
 	char currentCaracter = file.eof();
 	if (!file.eof()) {
 		file.get(currentCaracter);
+		currentColumn++;
 	}
 
 	return (int)currentCaracter;
 }
 
 int Lexer::caseMultiSeparated(int letter, std::ifstream& file) {
-	token = (char)letter;
+	token += (char)letter;
 	
 	while (!file.eof()) {
 		int nextLetter = readCharacterFromFile(file);
@@ -224,9 +226,7 @@ int Lexer::caseOneSeparated(int letter, std::ifstream& file) {
 			return caseMultiSeparated(letter, file);
 		} else {
 			token = (char)letter;
-			if (!token.empty()) {
-				addToken(token);
-			}
+			addToken(token);
 			token = "";
 			resetTokenStatus();
 			return readCharacterFromFile(file);
@@ -235,7 +235,7 @@ int Lexer::caseOneSeparated(int letter, std::ifstream& file) {
 }
 
 int Lexer::caseLetter(int letter, std::ifstream& file) {
-	token = (char)letter;
+	token += (char)letter;
 	currentTokenState[TOKEN_STATUS_IDENTIFIER] = 1;
 	currentTokenState[TOKEN_STATUS_RESERVED_WORD] = 1;
 
@@ -263,7 +263,7 @@ int Lexer::caseLetter(int letter, std::ifstream& file) {
 
 int Lexer::caseNumber(int letter, std::ifstream& file) {
 	currentTokenState[TOKEN_STATUS_CONSTANT] = 1;
-	token = (char)letter;
+	token += (char)letter;
 
 	while (!file.eof()) {
 		int nextLetter = readCharacterFromFile(file);
@@ -283,7 +283,7 @@ int Lexer::caseNumber(int letter, std::ifstream& file) {
 int Lexer::caseComment(int letter, std::ifstream& file) {
 	resetTokenStatus();
 	currentTokenState[TOKEN_STATUS_COMMENT] = 1;
-	token = (char)letter;
+	token += (char)letter;
 	bool isStartFound = false;
 
 	int nextLetter = readCharacterFromFile(file);
@@ -291,8 +291,7 @@ int Lexer::caseComment(int letter, std::ifstream& file) {
 	if (nextLetter != '*') {
 		std::cout << "Error comment must start with '(*'" << std::endl;
 		return nextLetter;
-	}
-	else {
+	} else {
 		token += (char)nextLetter;
 	}
 
@@ -311,6 +310,8 @@ int Lexer::caseComment(int letter, std::ifstream& file) {
 			isStartFound = false;
 		}
 
+		if (nextLetter == '\n') { currentRow++; currentColumn = 0; }
+
 		token += (char)nextLetter;
 
 	}
@@ -321,37 +322,61 @@ bool Lexer::isComment(int letter) {
 	return letter == '(';
 }
 
-void Lexer::scanFileNotRecyrsivly(const char* filePath) {
+void Lexer::scanFile(const char* filePath) {
 	std::ifstream file;
 
 	file.open(filePath, std::ios::in);
 
+	int savedLetter = -1;
+
 	while (!file.eof()) {
-		int letter = readCharacterFromFile(file);
+		int letter = savedLetter == -1 ? readCharacterFromFile(file) : savedLetter;
 
 		if (isLetter(letter)) {
+			savedLetter = -1;
+			savedColumn = currentColumn;
+			savedRow = currentRow;
 			letter = caseLetter(letter, file);
 		}
 
+		if (isOneSeparated(letter)) {
+			savedLetter = -1;
+			savedColumn = currentColumn;
+			savedRow = currentRow;
+			letter = caseOneSeparated(letter, file);
+		}
+
 		if (isNumber(letter)) {
+			savedLetter = -1;
+			savedColumn = currentColumn;
+			savedRow = currentRow;
 			letter = caseNumber(letter, file);
 		}
 
 		if (isComment(letter)) {
+			savedLetter = -1;
+			savedColumn = currentColumn;
+			savedRow = currentRow;
 			letter = caseComment(letter, file);
 		}
-
-		if (isOneSeparated(letter)) {
-			letter = caseOneSeparated(letter, file);
-		}
-
+	
 		if (isWhiteSpace(letter)) {
+			savedColumn = currentColumn;
+			savedRow = currentRow;
+			savedLetter = -1;
 			if (!token.empty()) {
 				addToken(token);
 			}
 			token = "";
 			resetTokenStatus();
+			if (letter == '\n') {
+				currentColumn = 0;
+				currentRow++;
+			}
+			continue;
 		}
+		
+		savedLetter = letter;
 
 	}
 

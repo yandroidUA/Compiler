@@ -6,5 +6,5 @@
 
 int main() {
     Lexer lexer;
-    lexer.scanFileNotRecyrsivly("program.yandroidUA");
+    lexer.scanFile("program.yandroidUA");
 }
