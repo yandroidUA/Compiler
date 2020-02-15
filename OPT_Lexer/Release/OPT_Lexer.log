@@ -1,0 +1,8 @@
+﻿  OPT_Lexer.cpp
+C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\TokenStatus.h(8,2): warning C4091: typedef : пропускается слева от "TokenStatus", когда ни одна переменная не объявлена
+  Создание кода
+  14 of 437 functions ( 3.2%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    4 functions had inline decision re-evaluated but remain unchanged
+  Создание кода завершено
+  OPT_Lexer.vcxproj -> C:\Users\yanec\source\repos\OPT_Lexer\Release\OPT_Lexer.exe
