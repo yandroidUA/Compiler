@@ -1,9 +1,8 @@
 ﻿  Lexer.cpp
-  OPT_Lexer.cpp
-  Создание кода...
-C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(235): warning C4715: Lexer::caseOneSeparated: значение возвращается не при всех путях выполнения
-C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(262): warning C4715: Lexer::caseLetter: значение возвращается не при всех путях выполнения
-C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(281): warning C4715: Lexer::caseNumber: значение возвращается не при всех путях выполнения
-C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(319): warning C4715: Lexer::caseComment: значение возвращается не при всех путях выполнения
-C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(219): warning C4715: Lexer::caseMultiSeparated: значение возвращается не при всех путях выполнения
+C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\TokenStatus.h(8,2): warning C4091: typedef : пропускается слева от "TokenStatus", когда ни одна переменная не объявлена
+C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(293): warning C4715: Lexer::caseMultiSeparated: значение возвращается не при всех путях выполнения
+C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(309): warning C4715: Lexer::caseOneSeparated: значение возвращается не при всех путях выполнения
+C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(336): warning C4715: Lexer::caseLetter: значение возвращается не при всех путях выполнения
+C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(355): warning C4715: Lexer::caseNumber: значение возвращается не при всех путях выполнения
+C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(393): warning C4715: Lexer::caseComment: значение возвращается не при всех путях выполнения
   OPT_Lexer.vcxproj -> C:\Users\yanec\source\repos\OPT_Lexer\Debug\OPT_Lexer.exe

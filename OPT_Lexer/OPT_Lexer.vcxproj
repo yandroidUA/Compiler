@@ -152,7 +152,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lexer.h" />
+    <ClInclude Include="LexerResult.h" />
     <ClInclude Include="MultiSeparatedToken.h" />
+    <ClInclude Include="TokenStatus.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="program.yandroidUA" />

@@ -99,6 +99,9 @@ Lexer::Lexer() {
 
 	addOneSeparatedToken(":");
 	addOneSeparatedToken(";");
+	addOneSeparatedToken("[");
+	addOneSeparatedToken("]");
+	addOneSeparatedToken(".");
 	
 	addMultiSeparatedToken(":=");
 	addMultiSeparatedToken("..");
@@ -107,26 +110,31 @@ Lexer::Lexer() {
 void Lexer::addToken(std::string&) {
 	if (currentTokenState[TOKEN_STATUS_CONSTANT] == 1) {
 		std::cout << token << " is constant, row=" << savedRow << " column=" << savedColumn << std::endl;
+		addTokenToResultVector(token, CONSTANT, savedColumn, savedRow);
 		return;
 	}
 
 	if (currentTokenState[TOKEN_STATUS_IDENTIFIER] == 1 && currentTokenState[TOKEN_STATUS_RESERVED_WORD] == 0) {
 		std::cout << token << " is identifier, row=" << savedRow << " column=" << savedColumn << std::endl;
+		addTokenToResultVector(token, IDENTIFIER, savedColumn, savedRow);
 		return;
 	}
 
 	if (currentTokenState[TOKEN_STATUS_RESERVED_WORD] == 1 && currentTokenState[TOKEN_STATUS_IDENTIFIER] == 0) {
 		std::cout << token << " is reserved word, row=" << savedRow << " column=" << savedColumn << std::endl;
+		addTokenToResultVector(token, RESERVED_WORD, savedColumn, savedRow);
 		return;
 	}
 
 	if (currentTokenState[TOKEN_STATUS_ONE_SEPARATED_TOKEN] == 1) {
 		std::cout << token << " is one separated word, row=" << savedRow << " column=" << savedColumn << std::endl;
+		addTokenToResultVector(token, ONE_SEPARATED_TOKEN, savedColumn, savedRow);
 		return;
 	}
 
 	if (currentTokenState[TOKEN_STATUS_MULTI_SEPARATED_TOKEN] == 1) {
 		std::cout << token << " is multi separated word, row=" << savedRow << " column=" << savedColumn << std::endl;
+		addTokenToResultVector(token, MULTI_SEPARATED_TOKEN, savedColumn, savedRow);
 		return;
 	}
 
@@ -138,12 +146,60 @@ void Lexer::addToken(std::string&) {
 	int reservedWordCode = isTokenReservedWord(token);
 	if (reservedWordCode != -1) {
 		std::cout << token << " is reserved word, row=" << savedRow << "column=" << savedColumn << std::endl;
+		addTokenToResultVector(token, RESERVED_WORD, savedColumn, savedRow);
 		return;
 	} else {
 		std::cout << token << " is identifier, row=" << savedRow << "column=" << savedColumn << std::endl;
+		addTokenToResultVector(token, IDENTIFIER, savedColumn, savedRow);
 		return;
 	}
 
+}
+
+int Lexer::addIdentifier(std::string& token) {
+	identifiersTokensMap.insert(MapPair(token, variablesIndex));
+	int code = variablesIndex;
+	variablesIndex++;
+	return code;
+}
+
+int Lexer::addConstant(std::string& word) {
+	constantTokensMap.insert(MapPair(word, constantsIndex));
+	int code = constantsIndex;
+	constantsIndex++;
+	return code;
+}
+
+void Lexer::addTokenToResultVector(std::string& token, TokenStatus status, int column, int row) {
+	int code = -1;
+	switch (status) {
+	case IDENTIFIER:
+		code = isTokenIdentifier(token);
+		if (code == -1) {
+			code = addIdentifier(token);
+		}
+		lexerResultValues.push_back(LexerResult(token, code, row, column));
+		break;
+	case RESERVED_WORD:
+		code = isTokenReservedWord(token);
+		lexerResultValues.push_back(LexerResult(token, code, row, column));
+		break;
+	case ONE_SEPARATED_TOKEN:
+		code = isTokenOneSeparatedToken(token);
+		lexerResultValues.push_back(LexerResult(token, code, row, column));
+		break;
+	case MULTI_SEPARATED_TOKEN:
+		code = isTokenMultiSeparatedToken(token);
+		lexerResultValues.push_back(LexerResult(token, code, row, column));
+		break;
+	case CONSTANT:
+		code = isTokenConstant(token);
+		if (code == -1) {
+			code = addConstant(token);
+		}
+		lexerResultValues.push_back(LexerResult(token, code, row, column));
+		break;
+	}
 }
 
 void Lexer::addReservedWord(const char* word) {
@@ -183,6 +239,24 @@ int Lexer::isTokenMultiSeparatedToken(std::string& word) {
 	for (auto& multiSeparatedToken : multiSeparatedTokensMap) {
 		if (multiSeparatedToken.first == word) {
 			return multiSeparatedToken.second;
+		}
+	}
+	return -1;
+}
+
+int Lexer::isTokenIdentifier(std::string& word) {
+	for (auto& indentifier : identifiersTokensMap) {
+		if (indentifier.first == word) {
+			return indentifier.second;
+		}
+	}
+	return -1;
+}
+
+int Lexer::isTokenConstant(std::string& word) {
+	for (auto& constant : constantTokensMap) {
+		if (constant.first == word) {
+			return constant.second;
 		}
 	}
 	return -1;
@@ -366,8 +440,8 @@ void Lexer::scanFile(const char* filePath) {
 			savedLetter = -1;
 			if (!token.empty()) {
 				addToken(token);
+				token = "";
 			}
-			token = "";
 			resetTokenStatus();
 			if (letter == '\n') {
 				currentColumn = 0;
@@ -380,4 +454,10 @@ void Lexer::scanFile(const char* filePath) {
 
 	}
 
+}
+
+void Lexer::printScanResult() {
+	for (auto& result : lexerResultValues) {
+		result.print();
+	}
 }

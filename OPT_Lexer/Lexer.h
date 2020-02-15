@@ -3,10 +3,12 @@
 #include <fstream>
 #include <map>
 #include "MultiSeparatedToken.h"
+#include "LexerResult.h"
+#include "TokenStatus.h"
 
 class Lexer {
 private:
-	//TODO refactor to use int[]
+	
 	std::vector<int> lettersVector = {
 		'a', 'A', 'b', 'B', 'c', 'C', 'd', 'D', 'e', 'E', 'f', 'F', 'g', 'G', 'h', 'H',
 		'k', 'K', 'l', 'L', 'm', 'M', 'n', 'N', 'o', 'O', 'p', 'P', 'q', 'Q', 'r', 'R',
@@ -20,10 +22,13 @@ private:
 		MultiSeparatedToken(':', '='),
 		MultiSeparatedToken('.', '.')
 	};
+	std::vector<LexerResult> lexerResultValues;
 
 	std::map<std::string, int> reservedWords;
 	std::map<std::string, int> multiSeparatedTokensMap;
 	std::map<std::string, int> oneSeparatedTokensMap;
+	std::map<std::string, int> identifiersTokensMap;
+	std::map<std::string, int> constantTokensMap;
 
 	// search ASCII code of param in lettersVector and if found return TRUE else FALSE
 	bool isLetter(int);
@@ -43,6 +48,7 @@ private:
 	// set status of token to 0
 	void resetTokenStatus();
 	// check status of token and depends on value add token as: ReservedWord, Identifier, OneSeparatedToken or MultiSeparatedToken
+	// invoke addTokenToResult to add token to result vector
 	void addToken(std::string&);
 	// add param of func to reservedWords
 	void addReservedWord(const char*);
@@ -50,6 +56,12 @@ private:
 	void addOneSeparatedToken(const char*);
 	// add param of func to multiSeparatedTokensMap
 	void addMultiSeparatedToken(const char*);
+	// add token to identifiersTokensMap, returns code of just added identifier
+	int addIdentifier(std::string&);
+	// add token to constantTokensMap, returns code of just added constant
+	int addConstant(std::string&);
+	// add token to ResultsVector
+	void addTokenToResultVector(std::string&, TokenStatus, int, int);
 
 	// check if passed token (param of func) is contains in: _ and return code if contains and -1 if not
 	// _ = reservedWords
@@ -58,6 +70,10 @@ private:
 	int isTokenOneSeparatedToken(std::string&);
 	// _ = multiSeparatedTokensMap
 	int isTokenMultiSeparatedToken(std::string&);
+	// _ = identifiersTokensMap
+	int isTokenIdentifier(std::string&);
+	// _ = constantTokensMap
+	int isTokenConstant(std::string&);
 
 	// return ASCII code of next character from file
 	int readCharacterFromFile(std::ifstream&);
@@ -88,7 +104,11 @@ private:
 public:
 
 	Lexer();
+	~Lexer() = default;
 
 	void scanFile(const char*);
+	void printScanResult();
 };
+
+
 
