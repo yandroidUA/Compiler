@@ -109,6 +109,3 @@ public:
 	void scanFile(const char*);
 	void printScanResult();
 };
-
-
-
