@@ -40,5 +40,14 @@
     <None Include="program.yandroidUA">
       <Filter>Файлы ресурсов</Filter>
     </None>
+    <None Include="err0.yandroidUA">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+    <None Include="err1.yandroidUA">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+    <None Include="err2.yandroidUA">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
   </ItemGroup>
 </Project>

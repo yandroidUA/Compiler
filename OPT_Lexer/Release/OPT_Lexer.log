@@ -1,10 +1,10 @@
 ﻿  Lexer.cpp
 C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\TokenStatus.h(8,2): warning C4091: typedef : пропускается слева от "TokenStatus", когда ни одна переменная не объявлена
-  OPT_Lexer.cpp
-C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\TokenStatus.h(8,2): warning C4091: typedef : пропускается слева от "TokenStatus", когда ни одна переменная не объявлена
+C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(374,30): warning C4805: ==: небезопасное смешение типа "int" и типа "bool" в операции
   Создание кода
-  0 of 437 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(408): warning C4715: Lexer::caseComment: значение возвращается не при всех путях выполнения
+  2 of 437 functions ( 0.5%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+    3 functions had inline decision re-evaluated but remain unchanged
   Создание кода завершено
   OPT_Lexer.vcxproj -> C:\Users\yanec\source\repos\OPT_Lexer\Release\OPT_Lexer.exe

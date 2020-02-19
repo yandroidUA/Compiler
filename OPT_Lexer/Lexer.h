@@ -60,6 +60,7 @@ private:
 	int addIdentifier(std::string&);
 	// add token to constantTokensMap, returns code of just added constant
 	int addConstant(std::string&);
+
 	// add token to ResultsVector
 	void addTokenToResultVector(std::string&, TokenStatus, int, int);
 

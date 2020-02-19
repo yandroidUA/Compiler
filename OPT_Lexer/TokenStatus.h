@@ -1,5 +1,5 @@
 #pragma once
-typedef enum TokenStatus {
+enum TokenStatus {
 	IDENTIFIER,
 	RESERVED_WORD,
 	ONE_SEPARATED_TOKEN,

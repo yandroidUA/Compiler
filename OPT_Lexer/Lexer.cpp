@@ -20,8 +20,8 @@ int variablesIndex = 1001;
 int currentTokenState[6] = {0, 0, 0, 0, 0, 0};
 std::string token = "";
 
-int currentColumn = -1;
-int currentRow = 0;
+int currentColumn = 0;
+int currentRow = 1;
 int savedColumn = currentColumn;
 int savedRow = currentRow;
 bool errorHappened = false;
@@ -371,6 +371,11 @@ int Lexer::caseComment(int letter, std::ifstream& file) {
 
 	int nextLetter = readCharacterFromFile(file);
 
+	if (nextLetter == '\0') {
+		errorHappened = true;
+		std::cout << "ERROR_4 " << "unclose comment (row:" << currentRow << ", col:" << currentColumn << ")" << std::endl;
+		return nextLetter;
+	}
 	if (nextLetter != '*') {
 		std::cout << "ERROR_2 " << "comment must start with '(*' (row:" << currentRow << ", col:" << currentColumn << ")" << std::endl;
 		errorHappened = true;
@@ -381,6 +386,12 @@ int Lexer::caseComment(int letter, std::ifstream& file) {
 
 	while (!file.eof()) {
 		nextLetter = readCharacterFromFile(file);
+
+		if (nextLetter == '\0') {
+			errorHappened = true;
+			std::cout << "ERROR_4 " << "unclose comment (row:" << currentRow << ", col:" << currentColumn << ")" << std::endl;
+			return nextLetter;
+		}
 
 		if (nextLetter == '*') {
 			isStartFound = true;

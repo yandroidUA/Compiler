@@ -23,7 +23,8 @@ public:
 	inline int getColumnNumber() const { return columnNumber; }
 
 	void print() {
-		std::cout << token << ", code=" << code << ", column=" << columnNumber << ", row=" << rowNumber << std::endl;
+		// std::cout << token << ", code=" << code << ", column=" << columnNumber << ", row=" << rowNumber << std::endl;
+		std::cout << rowNumber << " " << columnNumber << " " << code << " " << token << std::endl;
 	}
 
 private:

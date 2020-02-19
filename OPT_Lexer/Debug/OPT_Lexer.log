@@ -1,8 +1,9 @@
 ﻿  Lexer.cpp
-C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\TokenStatus.h(8,2): warning C4091: typedef : пропускается слева от "TokenStatus", когда ни одна переменная не объявлена
+  OPT_Lexer.cpp
+  Создание кода...
 C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(294): warning C4715: Lexer::caseMultiSeparated: значение возвращается не при всех путях выполнения
-C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(337): warning C4715: Lexer::caseLetter: значение возвращается не при всех путях выполнения
 C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(310): warning C4715: Lexer::caseOneSeparated: значение возвращается не при всех путях выполнения
-C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(403): warning C4715: Lexer::caseComment: значение возвращается не при всех путях выполнения
+C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(337): warning C4715: Lexer::caseLetter: значение возвращается не при всех путях выполнения
+C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(414): warning C4715: Lexer::caseComment: значение возвращается не при всех путях выполнения
 C:\Users\yanec\source\repos\OPT_Lexer\OPT_Lexer\Lexer.cpp(364): warning C4715: Lexer::caseNumber: значение возвращается не при всех путях выполнения
   OPT_Lexer.vcxproj -> C:\Users\yanec\source\repos\OPT_Lexer\Debug\OPT_Lexer.exe

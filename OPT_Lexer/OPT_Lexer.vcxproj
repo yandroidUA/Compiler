@@ -157,6 +157,9 @@
     <ClInclude Include="TokenStatus.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="err0.yandroidUA" />
+    <None Include="err1.yandroidUA" />
+    <None Include="err2.yandroidUA" />
     <None Include="program.yandroidUA" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,5 +1,5 @@
 PROGRAM PR;
-	VAR A:FLOAT;
+    VAR A:FLOAT;
 	VAR C 0 .. 10;
 	VAR B:FLOAT;
 	VAR B:FLOAT;
@@ -8,10 +8,10 @@ PROGRAM PR;
 	adlaskd;laskdla
 	alskdalskdjak
 	**********)
-	(asdasdasd****)
+	(*asdasdasd****)
 BEGIN
 	LOOP 
-		C:=0;
+		C:=A
 		A:=C;
 		A:=C[A];
 		A:=C[1];

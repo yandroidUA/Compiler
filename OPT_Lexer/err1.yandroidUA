@@ -1,18 +1,2 @@
-PROGRAM PR;
-	VAR A:FLOAT;
-	VAR C 0 .. 10;
-	VAR B:FLOAT;
-	VAR B:FLOAT;
-	(*LOLOASDASKLDASDJALKSDJALKDLAKJdLASKdj****U*ASKDJAKSDHAD**ASDLJK*)
-	(*BEGIN asdasd
-	adlaskd;laskdla
-	alskdalskdjak
-	**********)
-BEGIN
-	LOOP 
-		C:=0a2;
-		A:=C;
-		A:=C[A];
-		A:=C[1];
-	ENDLOOP;
-END.
+(*
+a
