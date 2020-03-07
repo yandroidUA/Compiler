@@ -1,5 +1,7 @@
 PROGRAM PR;
    VAR A:INTEGER;
+   B:FLOAT;
+   C: [0 .. 10];
 BEGIN
 	C:=A;
 	LOOP 
