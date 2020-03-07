@@ -109,4 +109,5 @@ public:
 
 	void scanFile(const char*);
 	void printScanResult();
+	std::vector<LexerResult> getResults();
 };

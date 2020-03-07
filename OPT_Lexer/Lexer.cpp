@@ -90,22 +90,23 @@ void Lexer::resetTokenStatus() {
 }
 
 Lexer::Lexer() {
-	addReservedWord("PROGRAM");
-	addReservedWord("BEGIN");
-	addReservedWord("END");
-	addReservedWord("VAR");
-	addReservedWord("FLOAT");
-	addReservedWord("LOOP");
-	addReservedWord("ENDLOOP");
+	addReservedWord("PROGRAM"); //401
+	addReservedWord("BEGIN");	//402
+	addReservedWord("END");		//403
+	addReservedWord("VAR");		//404
+	addReservedWord("FLOAT");	//405
+	addReservedWord("LOOP");	//406
+	addReservedWord("ENDLOOP");	//407
+	addReservedWord("INTEGER");	//408
 
-	addOneSeparatedToken(":");
-	addOneSeparatedToken(";");
-	addOneSeparatedToken("[");
-	addOneSeparatedToken("]");
-	addOneSeparatedToken(".");
+	addOneSeparatedToken(":");	//0
+	addOneSeparatedToken(";");	//1
+	addOneSeparatedToken("[");	//2
+	addOneSeparatedToken("]");	//3
+	addOneSeparatedToken(".");	//4
 	
-	addMultiSeparatedToken(":=");
-	addMultiSeparatedToken("..");
+	addMultiSeparatedToken(":=");//301
+	addMultiSeparatedToken("..");//302
 }
 
 void Lexer::addToken(std::string&) {
@@ -179,26 +180,26 @@ void Lexer::addTokenToResultVector(std::string& token, TokenStatus status, int c
 		if (code == -1) {
 			code = addIdentifier(token);
 		}
-		lexerResultValues.push_back(LexerResult(token, code, row, column));
+		lexerResultValues.push_back(LexerResult(token, code, row, column, lexerResultValues.size()));
 		break;
 	case RESERVED_WORD:
 		code = isTokenReservedWord(token);
-		lexerResultValues.push_back(LexerResult(token, code, row, column));
+		lexerResultValues.push_back(LexerResult(token, code, row, column, lexerResultValues.size()));
 		break;
 	case ONE_SEPARATED_TOKEN:
 		code = isTokenOneSeparatedToken(token);
-		lexerResultValues.push_back(LexerResult(token, code, row, column));
+		lexerResultValues.push_back(LexerResult(token, code, row, column, lexerResultValues.size()));
 		break;
 	case MULTI_SEPARATED_TOKEN:
 		code = isTokenMultiSeparatedToken(token);
-		lexerResultValues.push_back(LexerResult(token, code, row, column));
+		lexerResultValues.push_back(LexerResult(token, code, row, column, lexerResultValues.size()));
 		break;
 	case CONSTANT:
 		code = isTokenConstant(token);
 		if (code == -1) {
 			code = addConstant(token);
 		}
-		lexerResultValues.push_back(LexerResult(token, code, row, column));
+		lexerResultValues.push_back(LexerResult(token, code, row, column, lexerResultValues.size()));
 		break;
 	}
 }
@@ -491,4 +492,8 @@ void Lexer::printScanResult() {
 	for (auto& result : lexerResultValues) {
 		result.print();
 	}
+}
+
+std::vector<LexerResult> Lexer::getResults(){
+	return lexerResultValues;
 }

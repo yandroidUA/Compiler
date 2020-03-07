@@ -5,11 +5,12 @@
 class LexerResult
 {
 public:
-	LexerResult(std::string token, int code, int rowNumber, int columnNumber) {
+	LexerResult(std::string token, int code, int rowNumber, int columnNumber, int indexInResultVector) {
 		this->token = token;
 		this->code = code;
 		this->columnNumber = columnNumber;
 		this->rowNumber = rowNumber;
+		this->indexInResultVector = indexInResultVector;
 	}
 
 	~LexerResult() = default;
@@ -22,9 +23,11 @@ public:
 
 	inline int getColumnNumber() const { return columnNumber; }
 
+	inline int getIndexInResultVector() const { return indexInResultVector; }
+
 	void print() {
 		// std::cout << token << ", code=" << code << ", column=" << columnNumber << ", row=" << rowNumber << std::endl;
-		std::cout << rowNumber << " " << columnNumber << " " << code << " " << token << std::endl;
+		std::cout << rowNumber << " " << columnNumber << " " << code << " " << token << "position in resultVector: " << indexInResultVector << std::endl;
 	}
 
 private:
@@ -32,4 +35,5 @@ private:
 	int code;
 	int rowNumber;
 	int columnNumber;
+	int indexInResultVector;
 };
