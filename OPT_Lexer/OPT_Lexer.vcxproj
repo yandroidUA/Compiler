@@ -150,6 +150,7 @@
     <ClCompile Include="Lexer.cpp" />
     <ClCompile Include="OPT_Lexer.cpp" />
     <ClCompile Include="SyntaxAnalyzer.cpp" />
+    <ClCompile Include="Tree.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lexer.h" />
@@ -157,6 +158,7 @@
     <ClInclude Include="MultiSeparatedToken.h" />
     <ClInclude Include="SyntaxAnalyzer.h" />
     <ClInclude Include="TokenStatus.h" />
+    <ClInclude Include="Tree.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="err0.yandroidUA" />

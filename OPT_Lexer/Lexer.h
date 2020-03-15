@@ -25,10 +25,10 @@ private:
 	std::vector<LexerResult> lexerResultValues;
 
 	std::map<std::string, int> reservedWords;
-	std::map<std::string, int> multiSeparatedTokensMap;
-	std::map<std::string, int> oneSeparatedTokensMap;
-	std::map<std::string, int> identifiersTokensMap;
 	std::map<std::string, int> constantTokensMap;
+	std::map<std::string, int> identifiersTokensMap;
+	std::map<std::string, int> oneSeparatedTokensMap;
+	std::map<std::string, int> multiSeparatedTokensMap;
 
 	// search ASCII code of param in lettersVector and if found return TRUE else FALSE
 	bool isLetter(int);

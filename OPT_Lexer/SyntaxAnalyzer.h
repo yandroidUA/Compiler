@@ -1,6 +1,7 @@
 #pragma once
 #include "LexerResult.h"
 #include <vector>
+#include "Tree.h"
 
 class SyntaxAnalyzer
 {
@@ -10,34 +11,49 @@ public:
 private:
 	int currentIndex = 0;
 	std::vector<LexerResult> lexerResults;
+	Tree tree;
 
-	// reads from lexerResults symbol with index @param
+	/*	reads from lexerResults symbol with index @param 
+		if IndexOutOfBoundsException -> print exception "Unexpected end of file"
+		and end analyzing
+	*/
 	LexerResult getItem(int);
-	
+	// 
 	void handleError(const char*, LexerResult);
- 
+	/*	start analyzing with 2-nd rule 
+		return true if exception not hapenned and false if happened 
+		during analyzing all program
+	*/
 	bool caseProgram(int);
-	LexerResult caseIdentifier(int);
+	/*	each of this functions takes int
+		this is index of item in lexerResults to analyze
+		and each of this function return item next from lexerResults
+		that don't match rule of function
+		or LexerResult nullableResult("", -1, -1, -1, -1); */
 	LexerResult caseBlock(int);
-	LexerResult caseVariableDeclarations(int);
-	LexerResult caseDeclarationList(int);
-	LexerResult caseDeclaration(int);
-	LexerResult caseAttribute(int);
-	LexerResult caseAttributeList(int);
 	LexerResult caseRange(int);
-	// index of currentItem and index of token to end recurssion
-	LexerResult caseStatementList(int, int);
-	LexerResult caseStatement(int);
-	LexerResult caseExpression(int);
-	LexerResult caseDimension(int);
 	LexerResult caseVariable(int);
+	LexerResult caseAttribute(int, Tree::TreeItem*);
+	LexerResult caseStatement(int);
+	LexerResult caseDimension(int);
+	LexerResult caseIdentifier(int);
+	LexerResult caseExpression(int);
+	LexerResult caseDeclaration(int);
+	LexerResult caseAttributeList(int);
+	LexerResult caseDeclarationList(int, Tree::TreeItem *);
+	LexerResult caseVariableDeclarations(int);
+	/*	this function takes 2 parametrs,
+	first one is default as for other functions
+	second is code of item
+	fucntion check code of item that have index of first param and if it is equal second param
+	return this item in other case continue it logic */
+	LexerResult caseStatementList(int, int);
 
 };
 
-
-/*
+/*									RULES
 1. <signal-program> --> <program>
-2. <program> --> PROGRAM <procedure-identifier> ;
+2. <program> --> PROGRAM <procedure-identifier>;
 <block>.
 3. <block> --> <variable-declarations> BEGIN <statements-list> END
 4. <variable-declarations> --> VAR <declarations-list>|<empty>
