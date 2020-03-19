@@ -1,0 +1,54 @@
+
+
+LOOP expected, row = 6 column = 2 but got VAR
+
+(0)<signal-program> --> <program>
+(2)**<program> --> PROGRAM <procedure-identifier>;< block > .
+(4)****<procedure-identifier> --> <identifier>
+(6)******<identifier> --> <letter><string>
+(8)********1001
+(4)****<block> --> <variable-declarations> BEGIN <statements-list> END
+(6)******<variable-declarations> --> VAR <declarations-list>|<empty>
+(8)********404
+(8)********<declarations-list> --> <declaration><declarations-list>|<empty>
+(10)**********<declaration> --><variable-identifier>:<attribute><attributes-list>;
+(12)************<variable-identifier> --> <identifier>
+(14)**************<identifier> --> <letter><string>
+(16)****************1002
+(12)************0
+(12)************< attribute > -- > INTEGER | FLOAT | [<range>]
+(14)**************408
+(12)************<attributes-list> --> <attribute> <attributes-list> | <empty>
+(14)**************<empty>
+(10)**********<declarations-list> --> <declaration><declarations-list>|<empty>
+(12)************<declaration> --><variable-identifier>:<attribute><attributes-list>;
+(14)**************<variable-identifier> --> <identifier>
+(16)****************<identifier> --> <letter><string>
+(18)******************1003
+(14)**************0
+(14)**************< attribute > -- > INTEGER | FLOAT | [<range>]
+(16)****************405
+(14)**************<attributes-list> --> <attribute> <attributes-list> | <empty>
+(16)****************<empty>
+(12)************<declarations-list> --> <declaration><declarations-list>|<empty>
+(14)**************<declaration> --><variable-identifier>:<attribute><attributes-list>;
+(16)****************<variable-identifier> --> <identifier>
+(18)******************<identifier> --> <letter><string>
+(20)********************1004
+(16)****************0
+(16)****************< attribute > -- > INTEGER | FLOAT | [<range>]
+(18)******************2
+(18)******************<range> --> <unsigned-integer> .. <unsigned-integer>
+(20)********************<unsigned-integer>
+(22)**********************501
+(20)********************302 - ..
+(20)********************<unsigned-integer>
+(22)**********************502
+(20)********************3
+(16)****************<attributes-list> --> <attribute> <attributes-list> | <empty>
+(18)******************<empty>
+(14)**************<declarations-list> --> <declaration><declarations-list>|<empty>
+(16)****************<empty>
+(6)******402 - BEGIN
+(6)******<statements-list> --> <statement> <statements-list> | <empty>
+(8)********<statement> --> <variable> := <expression> ; | LOOP <statements-list> ENDLOOP;

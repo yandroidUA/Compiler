@@ -102,12 +102,34 @@ private:
 	// returns ASCII code of letter that don't in comment block, but before invoke addToken and add scanned token
 	int caseComment(int, std::ifstream&);
 
+	void handleError(const char* text, char letter, int row, int column);
+
 public:
 
 	Lexer();
 	~Lexer() = default;
 
-	void scanFile(const char*);
+	struct AnalyzeResult {
+
+		AnalyzeResult(bool success, std::string message) {
+			this->success = success;
+			this->errorMessage = message;
+		}
+
+		inline bool isSuccess() const {
+			return success;
+		}
+
+		inline std::string getErrorMassage() const {
+			return errorMessage;
+		}
+
+	private:
+		std::string errorMessage;
+		bool success;
+	};
+
+	AnalyzeResult scanFile(const char*);
 	void printScanResult();
 	std::vector<LexerResult> getResults();
 };

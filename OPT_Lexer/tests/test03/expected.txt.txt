@@ -1,0 +1,6 @@
+Unclosed comment character: 0 code: 0 (row: 3 column: 1)
+
+PROGRAM expected, row = -1 column = -1 but got 
+
+(0)<signal-program> --> <program>
+(2)**<program> --> PROGRAM <procedure-identifier>;< block > .

@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include <fstream>
 
 class Tree {
 public:
@@ -40,6 +41,22 @@ public:
 
 		}
 
+		void dumpIntoFile(std::ofstream& fileStream, int tabulation) {
+			fileStream << "(" << tabulation << ")";
+			int tab = tabulation;
+
+			while (tab > 0) {
+				fileStream << "*";
+				tab--;
+			}
+
+			fileStream << data << std::endl;
+
+			for (auto& child : childs) {
+				child->dumpIntoFile(fileStream, tabulation + 2);
+			}
+		}
+
 	private:
 		std::vector<TreeItem*> childs;
 		std::string data;
@@ -70,6 +87,7 @@ public:
 	bool switchTo(TreeItem*);
 
 	void print();
+	void dumpIntoFile(std::ofstream&);
 
 private:
 	TreeItem* root;

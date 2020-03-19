@@ -63,6 +63,11 @@ Tree::TreeItem* Tree::getCurrent() {
 	return lastModified;
 }
 
+void Tree::dumpIntoFile(std::ofstream& outputStream) {
+	if (root == nullptr) return;
+	root->dumpIntoFile(outputStream, 0);
+}
+
 void Tree::print() {
 	if (root == nullptr) return;
 	root->print(0);

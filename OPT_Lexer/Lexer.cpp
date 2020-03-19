@@ -25,6 +25,7 @@ int currentRow = 1;
 int savedColumn = currentColumn;
 int savedRow = currentRow;
 bool errorHappened = false;
+std::string errorToken = "";
 
 bool Lexer::isLetter(int character) {
 	for (auto& c : lettersVector) {
@@ -346,9 +347,7 @@ int Lexer::caseNumber(int letter, std::ifstream& file) {
 		if (!isNumber(nextLetter)) {
 
 			if (!isOneSeparated(nextLetter) && !isWhiteSpace(nextLetter)) {
-				std::cout << "ERROR_3 " << (char)nextLetter << " code " << nextLetter << " is not number, whitespace or separator (row:"
-					<< currentRow << ", col:" << currentColumn << ")" << std::endl;
-				errorHappened = true;
+				handleError("Expected number or whitespace or separator, but got ", nextLetter, currentRow, currentColumn);
 				return nextLetter;
 			}
 
@@ -373,13 +372,12 @@ int Lexer::caseComment(int letter, std::ifstream& file) {
 	int nextLetter = readCharacterFromFile(file);
 
 	if (nextLetter == '\0') {
-		errorHappened = true;
-		std::cout << "ERROR_4 " << "unclose comment (row:" << currentRow << ", col:" << currentColumn << ")" << std::endl;
+		handleError("Unclosed comment", nextLetter, currentRow, currentColumn);
 		return nextLetter;
 	}
+
 	if (nextLetter != '*') {
-		std::cout << "ERROR_2 " << "comment must start with '(*' (row:" << currentRow << ", col:" << currentColumn << ")" << std::endl;
-		errorHappened = true;
+		handleError("Comment must start with '(*'", nextLetter, currentRow, currentColumn);
 		return nextLetter;
 	} else {
 		token += (char)nextLetter;
@@ -389,8 +387,7 @@ int Lexer::caseComment(int letter, std::ifstream& file) {
 		nextLetter = readCharacterFromFile(file);
 
 		if (nextLetter == '\0') {
-			errorHappened = true;
-			std::cout << "ERROR_4 " << "unclose comment (row:" << currentRow << ", col:" << currentColumn << ")" << std::endl;
+			handleError("Unclosed comment", nextLetter, currentRow, currentColumn);
 			return nextLetter;
 		}
 
@@ -414,11 +411,26 @@ int Lexer::caseComment(int letter, std::ifstream& file) {
 
 }
 
+void Lexer::handleError(const char* text, char letter, int row, int column) {
+	errorHappened = true;
+	std::cout << text << " character " << letter << " code: " << (int)letter << " (row: " << row << " column: " << column << ")" << std::endl;
+	errorToken = text;
+	errorToken.append(" character: ");
+	errorToken.append(std::to_string(letter));
+	errorToken.append(" code: ");
+	errorToken.append(std::to_string((int)letter));
+	errorToken.append(" (row: ");
+	errorToken.append(std::to_string(row));
+	errorToken.append(" column: ");
+	errorToken.append(std::to_string(column));
+	errorToken.append(")");
+}
+
 bool Lexer::isComment(int letter) {
 	return letter == '(';
 }
 
-void Lexer::scanFile(const char* filePath) {
+Lexer::AnalyzeResult Lexer::scanFile(const char* filePath) {
 	std::ifstream file;
 
 	file.open(filePath, std::ios::in);
@@ -433,7 +445,7 @@ void Lexer::scanFile(const char* filePath) {
 			savedColumn = currentColumn;
 			savedRow = currentRow;
 			letter = caseLetter(letter, file);
-			if (errorHappened) return;
+			if (errorHappened) return AnalyzeResult(errorHappened, errorToken);
 		}
 
 		if (isOneSeparated(letter)) {
@@ -441,7 +453,7 @@ void Lexer::scanFile(const char* filePath) {
 			savedColumn = currentColumn;
 			savedRow = currentRow;
 			letter = caseOneSeparated(letter, file);
-			if (errorHappened) return;
+			if (errorHappened) return AnalyzeResult(errorHappened, errorToken);
 		}
 
 		if (isNumber(letter)) {
@@ -449,7 +461,7 @@ void Lexer::scanFile(const char* filePath) {
 			savedColumn = currentColumn;
 			savedRow = currentRow;
 			letter = caseNumber(letter, file);
-			if (errorHappened) return;
+			if (errorHappened) return AnalyzeResult(errorHappened, errorToken);
 		}
 
 		if (isComment(letter)) {
@@ -457,7 +469,7 @@ void Lexer::scanFile(const char* filePath) {
 			savedColumn = currentColumn;
 			savedRow = currentRow;
 			letter = caseComment(letter, file);
-			if (errorHappened) return;
+			if (errorHappened) return AnalyzeResult(errorHappened, errorToken);
 		}
 	
 		if (isWhiteSpace(letter)) {
@@ -478,13 +490,15 @@ void Lexer::scanFile(const char* filePath) {
 		
 		// to prevent endless loop when met undefined letter
 		if (letter == savedLetter) {
-			std::cout << "ERROR_1 " << (char)letter << " code " << letter << " is undefined (row:" << currentRow << ", col:" << currentColumn << ")" << std::endl;
-			return;
+			handleError("Undefined symbol", letter, currentRow, currentColumn);
+			return AnalyzeResult(errorHappened, errorToken);
 		}
 
 		savedLetter = letter;
 
 	}
+
+	return AnalyzeResult(errorHappened, errorToken);
 
 }
 

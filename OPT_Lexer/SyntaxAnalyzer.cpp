@@ -1,13 +1,15 @@
 #include "SyntaxAnalyzer.h"
+#include <fstream>
 
 LexerResult nullableResult("", -1, -1, -1, -1);
 bool errorSyntaxHappened = false;
+std::string errorMessageSyntax;
 
 SyntaxAnalyzer::SyntaxAnalyzer(std::vector<LexerResult>& res) {
 	this->lexerResults = res;
 }
 
-void SyntaxAnalyzer::analyze(){  
+void SyntaxAnalyzer::analyze(const char* filename){  
 	tree.addChild("<signal-program> --> <program>");
 	if (caseProgram(0)) {
 		// tree.print();
@@ -15,10 +17,24 @@ void SyntaxAnalyzer::analyze(){
 	tree.print();
 }
 
+void SyntaxAnalyzer::dumpTreeIntoFile(const char* filename, std::string startText) {
+	std::ofstream file;
+	file.open(filename);
+	file << startText << std::endl << std::endl;
+
+	if (errorSyntaxHappened) {
+		file << errorMessageSyntax << std::endl << std::endl;
+	}
+
+	tree.dumpIntoFile(file);
+	file.close();
+}
+
 LexerResult SyntaxAnalyzer::getItem(int index){
 	if (lexerResults.size() <= index) {
 		errorSyntaxHappened = true;
 		std::cout << "Unexpected end of file" << std::endl;
+		errorMessageSyntax = "Unexpected end of file";
 		return nullableResult;
 	}
 	return lexerResults.at(index);
@@ -27,9 +43,16 @@ LexerResult SyntaxAnalyzer::getItem(int index){
 void SyntaxAnalyzer::handleError(const char* message, LexerResult failedItem) {
 	errorSyntaxHappened = true;
 	std::cout << message << ", row = " << failedItem.getRowNumber() << " column = " << failedItem.getColumnNumber() << ", but got " << failedItem.getToken() << std::endl;
+	errorMessageSyntax = message;
+	errorMessageSyntax.append(", row = ");
+	errorMessageSyntax.append(std::to_string(failedItem.getRowNumber()));
+	errorMessageSyntax.append(" column = ");
+	errorMessageSyntax.append(std::to_string(failedItem.getColumnNumber()));
+	errorMessageSyntax.append(" but got ");
+	errorMessageSyntax.append(failedItem.getToken());
 }
 
-// 2. < program > -- > PROGRAM <procedure - identifier>;
+// 2. < program > --> PROGRAM <procedure - identifier>;
 bool SyntaxAnalyzer::caseProgram(int index) {
 	Tree::TreeItem* it = tree.addNext("<program> --> PROGRAM <procedure-identifier>;< block > .");
 	
@@ -53,7 +76,7 @@ bool SyntaxAnalyzer::caseProgram(int index) {
 	return !errorSyntaxHappened;
 }
 
-// 3. < block > -- > <variable - declarations> BEGIN <statements - list> END
+// 3. < block > --> <variable - declarations> BEGIN <statements - list> END
 LexerResult SyntaxAnalyzer::caseBlock(int index) {
 	Tree::TreeItem* current = tree.getCurrent();
 	LexerResult item = caseVariableDeclarations(index);
@@ -115,7 +138,7 @@ LexerResult SyntaxAnalyzer::caseDeclarationList(int index, Tree::TreeItem* root)
 	return caseDeclarationList(item.getIndexInResultVector(), root);
 }
 
-// 6. <declaration> --><variable-identifier>:<attribute><attributes-list>;
+// 6. <declaration> --> <variable-identifier>:<attribute><attributes-list>;
 LexerResult SyntaxAnalyzer::caseDeclaration(int index) {
 	tree.addNext("<declaration> --><variable-identifier>:<attribute><attributes-list>;");
 	Tree::TreeItem* it = tree.getCurrent();
@@ -155,10 +178,12 @@ LexerResult SyntaxAnalyzer::caseAttributeList(int index) {
 		return getItem(index + 1);
 	}
 
-	return caseAttribute(index, it);
+	item = caseAttribute(index, it);
+	tree.switchTo(it);
+	return caseAttributeList(item.getIndexInResultVector() + 1);
 }
 
-// 8. < attribute > -- > INTEGER | FLOAT | [<range>]
+// 8. < attribute > --> INTEGER | FLOAT | [<range>]
 LexerResult SyntaxAnalyzer::caseAttribute(int index, Tree::TreeItem* root) {
 	tree.addNext("< attribute > -- > INTEGER | FLOAT | [<range>]");
 	 LexerResult item = getItem(index);
