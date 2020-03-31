@@ -9,7 +9,7 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<LexerResult>& res) {
 	this->lexerResults = res;
 }
 
-void SyntaxAnalyzer::analyze(const char* filename){  
+void SyntaxAnalyzer::analyze(){  
 	tree.addChild("<signal-program> --> <program>");
 	if (caseProgram(0)) {
 		// tree.print();
@@ -17,7 +17,7 @@ void SyntaxAnalyzer::analyze(const char* filename){
 	tree.print();
 }
 
-void SyntaxAnalyzer::dumpTreeIntoFile(const char* filename, std::string startText) {
+void SyntaxAnalyzer::dumpTreeIntoFile(std::string& filename, std::string startText) {
 	std::ofstream file;
 	file.open(filename);
 	file << startText << std::endl << std::endl;

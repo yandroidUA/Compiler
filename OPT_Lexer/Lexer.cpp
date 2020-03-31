@@ -430,7 +430,7 @@ bool Lexer::isComment(int letter) {
 	return letter == '(';
 }
 
-Lexer::AnalyzeResult Lexer::scanFile(const char* filePath) {
+Lexer::AnalyzeResult Lexer::scanFile(std::string& filePath) {
 	std::ifstream file;
 
 	file.open(filePath, std::ios::in);

@@ -7,8 +7,8 @@ class SyntaxAnalyzer
 {
 public:
 	SyntaxAnalyzer(std::vector<LexerResult>&);
-	void analyze(const char*);
-	void dumpTreeIntoFile(const char*, std::string);
+	void analyze();
+	void dumpTreeIntoFile(std::string&, std::string);
 private:
 	int currentIndex = 0;
 	std::vector<LexerResult> lexerResults;

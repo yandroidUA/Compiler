@@ -129,7 +129,7 @@ public:
 		bool success;
 	};
 
-	AnalyzeResult scanFile(const char*);
+	AnalyzeResult scanFile(std::string&);
 	void printScanResult();
 	std::vector<LexerResult> getResults();
 };
