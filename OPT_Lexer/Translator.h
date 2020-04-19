@@ -52,8 +52,9 @@ private:
 
 	bool caseStatementExpression(Tree::TreeItem*);
 
+	//TODO: expression must return more that 1 Tree::TreeItem* it must return type variable or unsigned integer and something else
 	Tree::TreeItem* caseExpression(Tree::TreeItem*);
-
+	//TODO: dimension must return more that 1 Tree::TreeItem* it must return type variable or unsigned integer and something else
 	Tree::TreeItem* caseDimension(Tree::TreeItem*);
 
 	Tree::TreeItem* caseVariable(Tree::TreeItem*);
