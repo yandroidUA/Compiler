@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include "Rules.h"
 
 class Tree {
 public:
@@ -12,12 +13,30 @@ public:
 
 	struct TreeItem {
 	public:
-		
-		TreeItem(std::string& data) {
+
+		TreeItem(std::string& data, Rules rule, int value) {
 			this->data = data;
+			this->value = value;
+			this->rule = rule;
 		}
 
 		~TreeItem() = default;
+
+		inline std::vector<TreeItem*> getChilds() {
+			return childs;
+		}
+
+		inline Rules getRule() const {
+			return rule;
+		}
+
+		inline std::string getStringData() const {
+			return data;
+		}
+
+		inline int getData() const {
+			return value;
+		}
 
 		TreeItem* add(TreeItem* item) {
 			childs.push_back(item);
@@ -58,25 +77,31 @@ public:
 		}
 
 	private:
+		// contains child of current rule
 		std::vector<TreeItem*> childs;
+		// contains rule as string (for output)
 		std::string data;
+		// contains id of rule
+		Rules rule;
+		// contains id of main resource (such as id of variable or identifier)
+		int value;
 	};
 
 	/*	add child to lastModified
 		DON'T modify the lastModified
 		return pointer to added item
 	*/
-	TreeItem* addChild(std::string&);
-	TreeItem* addChild(const char*);
-	TreeItem* addChild(int);
+	TreeItem* addChild(std::string, Rules, int);
+	TreeItem* addChild(const char*, Rules, int);
+	TreeItem* addChild(int, Rules, int);
 
 	/*	add next to lastModified 
 		lastModified become added TreeItem 
 		return pointer to added item
 	*/
-	TreeItem* addNext(std::string&);
-	TreeItem* addNext(const char*);
-	TreeItem* addNext(int);
+	TreeItem* addNext(std::string, Rules, int);
+	TreeItem* addNext(const char*, Rules, int);
+	TreeItem* addNext(int, Rules, int);
 
 	TreeItem* getCurrent();
 
@@ -88,6 +113,7 @@ public:
 
 	void print();
 	void dumpIntoFile(std::ofstream&);
+	TreeItem* getRoot();
 
 private:
 	TreeItem* root;
@@ -95,6 +121,6 @@ private:
 	int depth;
 	int elements;
 
-	TreeItem* add(std::string&, bool);
+	TreeItem* add(std::string&, Rules, int, bool);
 };
 

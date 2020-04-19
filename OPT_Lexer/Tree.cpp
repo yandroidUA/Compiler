@@ -7,38 +7,38 @@ Tree::Tree() {
 	this->depth = 0;
 }
 
-Tree::TreeItem* Tree::addChild(std::string& data) {
-	return add(data, false);
+Tree::TreeItem* Tree::addChild(std::string data, Rules rules, int value) {
+	return add(data, rules, value, false);
 }
 
-Tree::TreeItem* Tree::addChild(const char* data) {
+Tree::TreeItem* Tree::addChild(const char* data, Rules rules, int value) {
 	std::string str = data;
-	return add(str, false);
+	return add(str, rules, value, false);
 }
 
-Tree::TreeItem* Tree::addChild(int data) {
+Tree::TreeItem* Tree::addChild(int data, Rules rules, int value) {
 	std::string str = std::to_string(data);
-	return add(str, false);
+	return add(str, rules, value, false);
 }
 
-Tree::TreeItem* Tree::addNext(std::string& data) {
+Tree::TreeItem* Tree::addNext(std::string data, Rules rules, int value) {
 	depth++;
-	return add(data, true);
+	return add(data, rules, value, true);
 }
 
-Tree::TreeItem* Tree::addNext(const char* data) {
+Tree::TreeItem* Tree::addNext(const char* data, Rules rules, int value) {
 	std::string str = data;
-	return add(str, true);
+	return add(str, rules, value, true);
 }
 
-Tree::TreeItem* Tree::addNext(int data) {
+Tree::TreeItem* Tree::addNext(int data, Rules rules, int value) {
 	std::string str = std::to_string(data);
-	return add(str, true);
+	return add(str, rules, value, true);
 }
 
-Tree::TreeItem* Tree::add(std::string& data, bool isModify) {
+Tree::TreeItem* Tree::add(std::string& data, Rules rules, int value, bool isModify) {
 	elements++;
-	TreeItem* item = new TreeItem(data);
+	TreeItem* item = new TreeItem(data, rules, value);
 	if (root == nullptr) {
 		root = item;
 		lastModified = root;
@@ -66,6 +66,10 @@ Tree::TreeItem* Tree::getCurrent() {
 void Tree::dumpIntoFile(std::ofstream& outputStream) {
 	if (root == nullptr) return;
 	root->dumpIntoFile(outputStream, 0);
+}
+
+Tree::TreeItem* Tree::getRoot(){
+	return root;
 }
 
 void Tree::print() {

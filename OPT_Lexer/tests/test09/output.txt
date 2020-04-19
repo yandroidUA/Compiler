@@ -1,0 +1,134 @@
+
+
+(0)<signal-program> --> <program>
+(2)**<program> --> PROGRAM <procedure-identifier>;< block > .
+(4)****<procedure-identifier> --> <identifier>
+(6)******<identifier> --> <letter><string>
+(8)********PR
+(4)****<block> --> <variable-declarations> BEGIN <statements-list> END
+(6)******<variable-declarations> --> VAR <declarations-list>|<empty>
+(8)********VAR
+(8)********<declarations-list> --> <declaration><declarations-list>|<empty>
+(10)**********<declaration> --><variable-identifier>:<attribute><attributes-list>;
+(12)************<variable-identifier> --> <identifier>
+(14)**************<identifier> --> <letter><string>
+(16)****************A
+(12)************:
+(12)************< attribute > -- > INTEGER | FLOAT | [<range>]
+(14)**************INTEGER
+(12)************<attributes-list> --> <attribute> <attributes-list> | <empty>
+(14)**************<empty>
+(10)**********<declarations-list> --> <declaration><declarations-list>|<empty>
+(12)************<declaration> --><variable-identifier>:<attribute><attributes-list>;
+(14)**************<variable-identifier> --> <identifier>
+(16)****************<identifier> --> <letter><string>
+(18)******************B
+(14)**************:
+(14)**************< attribute > -- > INTEGER | FLOAT | [<range>]
+(16)****************FLOAT
+(14)**************<attributes-list> --> <attribute> <attributes-list> | <empty>
+(16)****************<empty>
+(12)************<declarations-list> --> <declaration><declarations-list>|<empty>
+(14)**************<declaration> --><variable-identifier>:<attribute><attributes-list>;
+(16)****************<variable-identifier> --> <identifier>
+(18)******************<identifier> --> <letter><string>
+(20)********************C
+(16)****************:
+(16)****************< attribute > -- > INTEGER | FLOAT | [<range>]
+(18)******************[
+(18)******************<range> --> <unsigned-integer> .. <unsigned-integer>
+(20)********************<unsigned-integer>
+(22)**********************501
+(20)********************..
+(20)********************<unsigned-integer>
+(22)**********************10
+(18)******************]
+(16)****************<attributes-list> --> <attribute> <attributes-list> | <empty>
+(18)******************<empty>
+(14)**************<declarations-list> --> <declaration><declarations-list>|<empty>
+(16)****************<empty>
+(6)******BEGIN
+(6)******<statements-list> --> <statement> <statements-list> | <empty>
+(8)********<statement> --> <variable> := <expression> ; | LOOP <statements-list> ENDLOOP;
+(10)**********<variable> --> <variable-identifier><dimension>
+(12)************<variable-identifier> --> <identifier>
+(14)**************<identifier> --> <letter><string>
+(16)****************C
+(12)************<dimension> --> [ <expression> ] | <empty>
+(14)**************[
+(14)**************<expression> --> <variable> | <unsigned-integer>
+(16)****************<variable> --> <variable-identifier><dimension>
+(18)******************<variable-identifier> --> <identifier>
+(20)********************<identifier> --> <letter><string>
+(22)**********************A
+(18)******************<dimension> --> [ <expression> ] | <empty>
+(20)********************[
+(20)********************<expression> --> <variable> | <unsigned-integer>
+(22)**********************<variable> --> <variable-identifier><dimension>
+(24)************************<variable-identifier> --> <identifier>
+(26)**************************<identifier> --> <letter><string>
+(28)****************************C
+(24)************************<dimension> --> [ <expression> ] | <empty>
+(26)**************************[
+(26)**************************<expression> --> <variable> | <unsigned-integer>
+(28)****************************<variable> --> <variable-identifier><dimension>
+(30)******************************<variable-identifier> --> <identifier>
+(32)********************************<identifier> --> <letter><string>
+(34)**********************************A
+(30)******************************<dimension> --> [ <expression> ] | <empty>
+(32)********************************<empty>
+(26)**************************]
+(20)********************]
+(14)**************]
+(10)**********:=
+(10)**********<expression> --> <variable> | <unsigned-integer>
+(12)************<variable> --> <variable-identifier><dimension>
+(14)**************<variable-identifier> --> <identifier>
+(16)****************<identifier> --> <letter><string>
+(18)******************A
+(14)**************<dimension> --> [ <expression> ] | <empty>
+(16)****************[
+(16)****************<expression> --> <variable> | <unsigned-integer>
+(18)******************<variable> --> <variable-identifier><dimension>
+(20)********************<variable-identifier> --> <identifier>
+(22)**********************<identifier> --> <letter><string>
+(24)************************C
+(20)********************<dimension> --> [ <expression> ] | <empty>
+(22)**********************[
+(22)**********************<expression> --> <variable> | <unsigned-integer>
+(24)************************<variable> --> <variable-identifier><dimension>
+(26)**************************<variable-identifier> --> <identifier>
+(28)****************************<identifier> --> <letter><string>
+(30)******************************A
+(26)**************************<dimension> --> [ <expression> ] | <empty>
+(28)****************************[
+(28)****************************<expression> --> <variable> | <unsigned-integer>
+(30)******************************<variable> --> <variable-identifier><dimension>
+(32)********************************<variable-identifier> --> <identifier>
+(34)**********************************<identifier> --> <letter><string>
+(36)************************************A
+(32)********************************<dimension> --> [ <expression> ] | <empty>
+(34)**********************************[
+(34)**********************************<expression> --> <variable> | <unsigned-integer>
+(36)************************************<variable> --> <variable-identifier><dimension>
+(38)**************************************<variable-identifier> --> <identifier>
+(40)****************************************<identifier> --> <letter><string>
+(42)******************************************A
+(38)**************************************<dimension> --> [ <expression> ] | <empty>
+(40)****************************************[
+(40)****************************************<expression> --> <variable> | <unsigned-integer>
+(42)******************************************<variable> --> <variable-identifier><dimension>
+(44)********************************************<variable-identifier> --> <identifier>
+(46)**********************************************<identifier> --> <letter><string>
+(48)************************************************C
+(44)********************************************<dimension> --> [ <expression> ] | <empty>
+(46)**********************************************<empty>
+(40)****************************************]
+(34)**********************************]
+(28)****************************]
+(22)**********************]
+(16)****************]
+(10)**********;
+(8)********<statements-list> --> <statement> <statements-list> | <empty>
+(10)**********<empty>
+(6)******END
