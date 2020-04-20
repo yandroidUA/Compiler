@@ -157,13 +157,13 @@ bool Translator::caseDeclaration(Tree::TreeItem* item) {
 		return false;
 	}
 
-	Tree::TreeItem* attribute = caseAttribtue(declarationChild.at(2));
+	Attribute* attribute = caseAttribtue(declarationChild.at(2));
 	if (attribute == nullptr) return false;
 
-	Tree::TreeItem* attributeList = caseAttributeList(declarationChild.at(3));
+	Attribute* attributeList = caseAttributeList(declarationChild.at(3));
 	if (attributeList == nullptr) return false;
 
-	attribute = attributeList->getRule() == EMPTY ? attribute : attributeList;
+	attribute = attributeList->getType() == Identifier::IdentifierType::EMPTY ? attribute : attributeList;
 
 	//TODO: GENERATE HERE DECLARATION ASM
 	if (isIdentifierDeclarated(variable->getData())) {
@@ -171,9 +171,8 @@ bool Translator::caseDeclaration(Tree::TreeItem* item) {
 		return false;
 	}
 
-	addIdentifier(Identifier(variable->getStringData(), variable->getData(), convertFromCode(attribute->getData(), false)));
+	addIdentifier(Identifier(variable->getStringData(), variable->getData(), attribute->getType()));
 
-	std::cout << variable->getStringData() << " " << attribute->getStringData() << " ?" << std::endl;
 	return true; 
 }
 
@@ -441,8 +440,7 @@ Tree::TreeItem* Translator::caseIdentifier(Tree::TreeItem* item, bool ignoreCrea
 	return identifier;
 }
 
-// TODO: when use this method need check the RULE of returned Tree::TreeItem if it;s RANGE -> need to parse Range and generate ASM
-Tree::TreeItem* Translator::caseAttribtue(Tree::TreeItem* item) {
+Attribute* Translator::caseAttribtue(Tree::TreeItem* item) {
 	if (item->getRule() != ATTRIBUTE) {
 		std::cout << "ERROR! ATTRIBUTE expected, but got " << item->getRule() << std::endl;
 		return nullptr;
@@ -451,8 +449,10 @@ Tree::TreeItem* Translator::caseAttribtue(Tree::TreeItem* item) {
 	std::vector<Tree::TreeItem*> attributeChilds = item->getChilds();
 
 	if (attributeChilds.size() == 1) {
-		if (attributeChilds.at(0)->getData() == FLOAT || attributeChilds.at(0)->getData() == INTEGER) {
-			return attributeChilds.at(0);
+		if (attributeChilds.at(0)->getData() == FLOAT) {
+			return new Attribute(Identifier::IdentifierType::FLOAT);
+		} else if (attributeChilds.at(0)->getData() == INTEGER) {
+			return new Attribute(Identifier::IdentifierType::INTEGER);
 		} else {
 			std::cout << "ERROR! <attribute> with 1 child must have INTEGER or FLOAT as chold, but got " << attributeChilds.at(0)->getRule() << std::endl;
 			return nullptr;
@@ -467,7 +467,7 @@ Tree::TreeItem* Translator::caseAttribtue(Tree::TreeItem* item) {
 	return caseRange(attributeChilds.at(1));
 }
 
-Tree::TreeItem* Translator::caseAttributeList(Tree::TreeItem* item) {
+Attribute* Translator::caseAttributeList(Tree::TreeItem* item) {
 	if (item->getRule() != ATTRIBUTES_LIST) {
 		std::cout << "ERROR! <attribute-list> expected, but got " << item->getRule() << std::endl;
 		return nullptr;
@@ -477,7 +477,7 @@ Tree::TreeItem* Translator::caseAttributeList(Tree::TreeItem* item) {
 
 	if (attributeListChilds.size() == 1) {
 		if (attributeListChilds.at(0)->getRule() == EMPTY) {
-			return attributeListChilds.at(0);
+			return new Attribute(Identifier::IdentifierType::EMPTY);
 		} else {
 			std::cout << "ERROR! <attribute-list> with childs count 1 MUST have only EMPTY child" << std::endl;
 			return nullptr;
@@ -489,15 +489,15 @@ Tree::TreeItem* Translator::caseAttributeList(Tree::TreeItem* item) {
 		return nullptr;
 	}
 
-	Tree::TreeItem* attribute = caseAttribtue(attributeListChilds.at(0));
+	Attribute* attribute = caseAttribtue(attributeListChilds.at(0));
 	if (attribute == nullptr) return nullptr;
 
-	Tree::TreeItem* attributeList = caseAttributeList(attributeListChilds.at(1));
+	Attribute* attributeList = caseAttributeList(attributeListChilds.at(1));
 
-	return attributeList->getRule() == EMPTY ? attribute : attributeList;
+	return attributeList->getType() == Identifier::IdentifierType::EMPTY ? attribute : attributeList;
 }
 
-Tree::TreeItem* Translator::caseRange(Tree::TreeItem* item) {
+RangeAttribute* Translator::caseRange(Tree::TreeItem* item) {
 	if (item->getRule() != RANGE) {
 		std::cout << "ERROR! Eexpected RANGE, but got " << item->getRule() << std::endl;
 		return nullptr;
@@ -522,7 +522,7 @@ Tree::TreeItem* Translator::caseRange(Tree::TreeItem* item) {
 	if (to == nullptr) return nullptr;
 	//TODO: add childs as i need
 	std::string str = from->getStringData() + " " + divider->getStringData() + " " + to->getStringData();
-	return new Tree::TreeItem(str, Rules::RANGE, DOUBLE_DOT);
+	return new RangeAttribute(from->getData(), to->getData());
 }
 
 Tree::TreeItem* Translator::caseUnsignedInteger(Tree::TreeItem* item) {

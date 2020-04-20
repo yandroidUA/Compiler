@@ -25,7 +25,7 @@ public:
 
 	inline IdentifierType getType() { return type; }
 
-private:
+protected:
 	int code;
 	std::string name;
 	IdentifierType type;

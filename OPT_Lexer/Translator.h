@@ -1,6 +1,8 @@
 #pragma once
 #include "Tree.h"
 #include "Identifier.h"
+#include "Attribute.h"
+#include "RangeAttribute.h"
 #include "Expression.h"
 
 class Translator {
@@ -69,21 +71,15 @@ private:
 
 	Tree::TreeItem* caseIdentifier(Tree::TreeItem*, bool);
 
-	Tree::TreeItem* caseAttribtue(Tree::TreeItem*);
+	Attribute* caseAttribtue(Tree::TreeItem*);
 
-	Tree::TreeItem* caseAttributeList(Tree::TreeItem*);
+	Attribute* caseAttributeList(Tree::TreeItem*);
 
-	// returns new TreeItem that has form and to as child
-	// [ from .. to ]; from & to type of unsigned-integer
-	// child[0] = from; child[1] = to
-	Tree::TreeItem* caseRange(Tree::TreeItem*);
+	RangeAttribute* caseRange(Tree::TreeItem*);
 
 	Tree::TreeItem* caseUnsignedInteger(Tree::TreeItem*);
 
 	Identifier::IdentifierType convertFromCode(int, bool);
 
-
-	// for translator rule 14. <dimension> --> [ <expression> ] | <empty>, should be rewriten as:
-	// 14. <dimension> --> [ <variable-identifier> ] | <empty>
 };
 

@@ -186,7 +186,7 @@ LexerResult SyntaxAnalyzer::caseAttributeList(int index) {
 
 	item = caseAttribute(index, it);
 	tree.switchTo(it);
-	return caseAttributeList(item.getIndexInResultVector() + 1);
+	return errorSyntaxHappened ? nullableResult : caseAttributeList(item.getIndexInResultVector());
 }
 
 // 8. < attribute > --> INTEGER | FLOAT | [<range>]
@@ -232,7 +232,7 @@ LexerResult SyntaxAnalyzer::caseRange(int index) {
 	}
 	tree.addNext("<unsigned-integer>", UNSIGNED_INTEGER, -1);
 	int code = item.getCode();
-	tree.addChild(code, ADDING_CONSTANT, code);
+	tree.addChild(item.getToken(), ADDING_CONSTANT, code);
 	tree.switchTo(it);
 	item = getItem(index + 1);
 

@@ -17,7 +17,10 @@
 (12)************< attribute > -- > INTEGER | FLOAT | [<range>]
 (14)**************INTEGER
 (12)************<attributes-list> --> <attribute> <attributes-list> | <empty>
-(14)**************<empty>
+(14)**************< attribute > -- > INTEGER | FLOAT | [<range>]
+(16)****************INTEGER
+(14)**************<attributes-list> --> <attribute> <attributes-list> | <empty>
+(16)****************<empty>
 (10)**********<declarations-list> --> <declaration><declarations-list>|<empty>
 (12)************<declaration> --><variable-identifier>:<attribute><attributes-list>;
 (14)**************<variable-identifier> --> <identifier>
@@ -28,13 +31,23 @@
 (16)****************[
 (16)****************<range> --> <unsigned-integer> .. <unsigned-integer>
 (18)******************<unsigned-integer>
-(20)********************501
+(20)********************0
 (18)******************..
 (18)******************<unsigned-integer>
 (20)********************10
 (16)****************]
 (14)**************<attributes-list> --> <attribute> <attributes-list> | <empty>
-(16)****************<empty>
+(16)****************< attribute > -- > INTEGER | FLOAT | [<range>]
+(18)******************[
+(18)******************<range> --> <unsigned-integer> .. <unsigned-integer>
+(20)********************<unsigned-integer>
+(22)**********************5
+(20)********************..
+(20)********************<unsigned-integer>
+(22)**********************10
+(18)******************]
+(16)****************<attributes-list> --> <attribute> <attributes-list> | <empty>
+(18)******************<empty>
 (12)************<declarations-list> --> <declaration><declarations-list>|<empty>
 (14)**************<declaration> --><variable-identifier>:<attribute><attributes-list>;
 (16)****************<variable-identifier> --> <identifier>
@@ -62,7 +75,15 @@
 (20)********************<identifier> --> <letter><string>
 (22)**********************B
 (18)******************<dimension> --> [ <expression> ] | <empty>
-(20)********************<empty>
+(20)********************[
+(20)********************<expression> --> <variable> | <unsigned-integer>
+(22)**********************<variable> --> <variable-identifier><dimension>
+(24)************************<variable-identifier> --> <identifier>
+(26)**************************<identifier> --> <letter><string>
+(28)****************************A
+(24)************************<dimension> --> [ <expression> ] | <empty>
+(26)**************************<empty>
+(20)********************]
 (14)**************]
 (10)**********:=
 (10)**********<expression> --> <variable> | <unsigned-integer>

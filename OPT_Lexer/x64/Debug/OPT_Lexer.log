@@ -1,5 +1,2 @@
-﻿  OPT_Lexer.cpp
-E:\GitHub\Lexer_OPT\OPT_Lexer\OPT_Lexer.cpp(29,74): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
-  Translator.cpp
-  Создание кода...
+﻿  SyntaxAnalyzer.cpp
   OPT_Lexer.vcxproj -> E:\GitHub\Lexer_OPT\x64\Debug\OPT_Lexer.exe
