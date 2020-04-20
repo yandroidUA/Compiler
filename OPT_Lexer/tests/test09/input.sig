@@ -1,7 +1,7 @@
 PROGRAM PR;
    VAR A:INTEGER;
-   B:FLOAT;
    C: [0 .. 10];
+   B : FLOAT;
 BEGIN
-	C[A[C[A]]] := A[C[A[A[A[C]]]]];
+	C[B] := A;
 END.

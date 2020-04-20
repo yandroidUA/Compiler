@@ -1,6 +1,7 @@
 #include "Lexer.h"
 #include <string>
 #include <iostream>
+#include "ReservedWords.h"
 
 typedef std::pair<std::string, int> MapPair;
 
@@ -91,23 +92,23 @@ void Lexer::resetTokenStatus() {
 }
 
 Lexer::Lexer() {
-	addReservedWord("PROGRAM"); //401
-	addReservedWord("BEGIN");	//402
-	addReservedWord("END");		//403
-	addReservedWord("VAR");		//404
-	addReservedWord("FLOAT");	//405
-	addReservedWord("LOOP");	//406
-	addReservedWord("ENDLOOP");	//407
-	addReservedWord("INTEGER");	//408
+	addReservedWord("PROGRAM", PROGRAM);				//401
+	addReservedWord("BEGIN", BEGIN);					//402
+	addReservedWord("END", END);						//403
+	addReservedWord("VAR", VAR);						//404
+	addReservedWord("FLOAT", FLOAT);					//405
+	addReservedWord("LOOP", LOOP);						//406
+	addReservedWord("ENDLOOP", ENDLOOP);				//407
+	addReservedWord("INTEGER", INTEGER);				//408
 
-	addOneSeparatedToken(":");	//0
-	addOneSeparatedToken(";");	//1
-	addOneSeparatedToken("[");	//2
-	addOneSeparatedToken("]");	//3
-	addOneSeparatedToken(".");	//4
+	addOneSeparatedToken(":", COLON);					//0
+	addOneSeparatedToken(";", SEMI_COLON);				//1
+	addOneSeparatedToken("[", LEFT_SQUARE_BRACKET);		//2
+	addOneSeparatedToken("]", RIGHT_SQUARE_BRACKET);	//3
+	addOneSeparatedToken(".", DOT);	//4
 	
-	addMultiSeparatedToken(":=");//301
-	addMultiSeparatedToken("..");//302
+	addMultiSeparatedToken(":=", EQUALS);				//301
+	addMultiSeparatedToken("..", DOUBLE_DOT);			//302
 }
 
 void Lexer::addToken(std::string&) {
@@ -205,19 +206,16 @@ void Lexer::addTokenToResultVector(std::string& token, TokenStatus status, int c
 	}
 }
 
-void Lexer::addReservedWord(const char* word) {
-	reservedWords.insert(MapPair(word, reservedWordsIndex));
-	reservedWordsIndex++;
+void Lexer::addReservedWord(const char* word, int code) {
+	reservedWords.insert(MapPair(word, code));
 }
 
-void Lexer::addOneSeparatedToken(const char* word) {
-	oneSeparatedTokensMap.insert(MapPair(word, oneSymbolTokenIndex));
-	oneSymbolTokenIndex++;
+void Lexer::addOneSeparatedToken(const char* word, int code) {
+	oneSeparatedTokensMap.insert(MapPair(word, code));
 }
 
-void Lexer::addMultiSeparatedToken(const char* word) {
-	multiSeparatedTokensMap.insert(MapPair(word, multiSymbolTokenIndex));
-	multiSymbolTokenIndex++;
+void Lexer::addMultiSeparatedToken(const char* word, int code) {
+	multiSeparatedTokensMap.insert(MapPair(word, code));
 }
 
 int Lexer::isTokenReservedWord(std::string& word){

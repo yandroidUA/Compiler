@@ -1,4 +1,6 @@
 #include "Translator.h"
+#include "ReservedWords.h"
+#include "Identifier.h"
 
 std::string dataSegmentString = "";
 std::string codeSegmentString = "";
@@ -15,13 +17,41 @@ void Translator::analyze(std::string) {
 }
 
 bool Translator::isIdentifierDeclarated(int identifierCode) {
-	return std::find(declaratedIdentifiers.begin(), declaratedIdentifiers.end(), identifierCode) != declaratedIdentifiers.end();
+	for (auto& identifier : declaratedIdentifiers) {
+		if (identifier.getCode() == identifierCode) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool Translator::isIdentifierIsRange(int code) {
+	for (auto& identifier : declaratedIdentifiers) {
+		if (identifier.getCode() == code) {
+			return identifier.getType() == Identifier::IdentifierType::RANGE;
+		}
+	}
+	return false;
+}
+
+bool Translator::isIdentifierIsInteger(int code) {
+	for (auto& identifier : declaratedIdentifiers) {
+		if (identifier.getCode() == code) {
+			return identifier.getType() == Identifier::IdentifierType::INTEGER;
+		}
+	}
+	return false;
+}
+
+void Translator::addIdentifier(Identifier identifier) {
+	declaratedIdentifiers.push_back(identifier);
 }
 
 void Translator::analyze(Tree::TreeItem* item, std::string& stringToWrite) {
 	if (item == nullptr) return;
 	switch (item->getRule()) {
-	case PROGRAM:
+	case PROGRAM_RULE:
 		 caseProgram(item);
 		 break;
 	default:
@@ -68,7 +98,7 @@ void Translator::caseBlock(Tree::TreeItem* item) {
 		return;
 	}
 
-	if (blockChilds.at(1)->getData() != 402) {
+	if (blockChilds.at(1)->getData() != BEGIN) {
 		std::cout << "ERROR! BEGIN expected, but got " << blockChilds.at(1)->getStringData() << std::endl;
 		return;
 	}
@@ -93,7 +123,7 @@ bool Translator::caseVariableDeclarations(Tree::TreeItem* item) {
 	}
 
 	// checking if 1st child of variableDeclarationsChild is VAR
-	if (variableDeclarationsChild.at(0)->getData() != 404) {
+	if (variableDeclarationsChild.at(0)->getData() != VAR) {
 		std::cout << "VAR(404) expected, but got " << variableDeclarationsChild.at(0)->getData() << std::endl;
 		return false;
 	}
@@ -119,10 +149,10 @@ bool Translator::caseDeclaration(Tree::TreeItem* item) {
 		return false;
 	}
 
-	Tree::TreeItem* variable = caseVariableIdentifier(declarationChild.at(0));
+	Tree::TreeItem* variable = caseVariableIdentifier(declarationChild.at(0), true);
 	if (variable == nullptr) return false;
 
-	if (declarationChild.at(1)->getData() != 0) {
+	if (declarationChild.at(1)->getData() != COLON) {
 		std::cout << "ERROR! Expected ':'(0), but got " << declarationChild.at(1)->getStringData() << std::endl;
 		return false;
 	}
@@ -136,6 +166,13 @@ bool Translator::caseDeclaration(Tree::TreeItem* item) {
 	attribute = attributeList->getRule() == EMPTY ? attribute : attributeList;
 
 	//TODO: GENERATE HERE DECLARATION ASM
+	if (isIdentifierDeclarated(variable->getData())) {
+		std::cout << "ERROR! " << variable->getStringData() << " already declarated!" << std::endl;
+		return false;
+	}
+
+	addIdentifier(Identifier(variable->getStringData(), variable->getData(), convertFromCode(attribute->getData(), false)));
+
 	std::cout << variable->getStringData() << " " << attribute->getStringData() << " ?" << std::endl;
 	return true; 
 }
@@ -209,7 +246,7 @@ bool Translator::caseStatement(Tree::TreeItem* item) {
 	}
 
 	// LOOP
-	if (statementChilds.at(0)->getData() == 406) {
+	if (statementChilds.at(0)->getData() == LOOP) {
 		return caseStatementLoop(item);
 	}
 	
@@ -227,7 +264,7 @@ bool Translator::caseStatementLoop(Tree::TreeItem* item) {
 	bool isStatemntList = caseStatementList(statementLoopChilds.at(1));
 	if (isStatemntList == false) return false;
 
-	if (statementLoopChilds.at(2)->getData() != 407) {
+	if (statementLoopChilds.at(2)->getData() != ENDLOOP) {
 		std::cout << "ERROR! ENDLOOP expected, but got " << statementLoopChilds.at(2)->getStringData() << std::endl;
 		return false;
 	}
@@ -242,19 +279,27 @@ bool Translator::caseStatementLoop(Tree::TreeItem* item) {
 bool Translator::caseStatementExpression(Tree::TreeItem* item) {
 	std::vector<Tree::TreeItem*> statementExpressionsChild = item->getChilds();
 
-	Tree::TreeItem* variable = caseVariable(statementExpressionsChild.at(0));
+	Expression* variable = caseVariable(statementExpressionsChild.at(0), false);
+	if (variable == nullptr) return false;
 
-	if (statementExpressionsChild.at(1)->getData() != 301) {
+	if (statementExpressionsChild.at(1)->getData() != EQUALS) {
 		std::cout << "ERROR! := expected, but got " << statementExpressionsChild.at(1)->getStringData() << std::endl;
 		return false;
 	}
 
 	//TODO: add [3] item must be ;
-	Tree::TreeItem* expression = caseExpression(statementExpressionsChild.at(2));
+	Expression* expression = caseExpression(statementExpressionsChild.at(2), false);
+	if (expression == nullptr) return false;
+
+	//TODO: simple print the statement
+	variable->print();
+	std::cout << " := ";
+	expression->print();
+
 	return true;
 }
 
-Tree::TreeItem* Translator::caseExpression(Tree::TreeItem* item) {
+Expression* Translator::caseExpression(Tree::TreeItem* item, bool isDimension) {
 	if (item->getRule() != EXPRESSION) {
 		std::cout << "ERROR! EXPRESSION expected, but got " << item->getRule() << std::endl;
 		return nullptr;
@@ -267,43 +312,60 @@ Tree::TreeItem* Translator::caseExpression(Tree::TreeItem* item) {
 		return nullptr;
 	}
 
+	Tree::TreeItem* unsignedInteger = nullptr;
 	switch (expressionChilds.at(0)->getRule()) {
-	case UNSIGNED_INTEGER: return caseUnsignedInteger(expressionChilds.at(0));
-	case VARIABLE: return caseVariable(expressionChilds.at(0));
+	case UNSIGNED_INTEGER:
+		unsignedInteger = caseUnsignedInteger(expressionChilds.at(0));
+		if (unsignedInteger == nullptr) return nullptr;
+		return new Expression(unsignedInteger->getStringData(), unsignedInteger->getData(), Expression::ExpressionType::UNSIGNED_INTEGER);
+	case VARIABLE: return caseVariable(expressionChilds.at(0), isDimension);
 	default: 
 		std::cout << "ERROR! UNSIGNED_INTEGER or VARIABLE expected, but got " << expressionChilds.at(0)->getRule() << std::endl;
 		return nullptr;
 	}
 }
 
-Tree::TreeItem* Translator::caseDimension(Tree::TreeItem* item) {
+Expression* Translator::caseDimension(Tree::TreeItem* item) {
 	if (item->getRule() != DIMENSION) {
 		std::cout << "ERROR! DIMENSION expected, but got " << item->getRule() << std::endl;
 		return nullptr;
 	}
 
-	std::vector<Tree::TreeItem*> diemnsionChilds = item->getChilds();
+	std::vector<Tree::TreeItem*> dimensionChilds = item->getChilds();
 
-	if (diemnsionChilds.size() == 1) {
-		if (diemnsionChilds.at(0)->getRule() == EMPTY) {
-			return diemnsionChilds.at(0);
+	if (dimensionChilds.size() == 1) {
+		if (dimensionChilds.at(0)->getRule() == EMPTY) {
+			return new Expression(dimensionChilds.at(0)->getStringData(), dimensionChilds.at(0)->getData(), Expression::ExpressionType::EMPTY);
 		} else {
 			std::cout << "ERROR! if size of <dimension> is 1 it must be EMPTY" << std::endl;
 			return nullptr;
 		}
 	}
 
-	if (diemnsionChilds.size() != 3) {
-		std::cout << "ERROR! <diemnsion> MUST have 1 or 3 childs, but got " << diemnsionChilds.size() << std::endl;
+	if (dimensionChilds.size() != 3) {
+		std::cout << "ERROR! <diemnsion> MUST have 1 or 3 childs, but got " << dimensionChilds.size() << std::endl;
+		return nullptr;
+	}
+	
+	if (dimensionChilds.at(0)->getData() != ReserverWords::LEFT_SQUARE_BRACKET) {
+		std::cout << "ERROR! '[' expected, but got " << dimensionChilds.at(1)->getStringData() << std::endl;
 		return nullptr;
 	}
 
-	//TODO: here check 0 & 2 childs
+	if (dimensionChilds.at(2)->getData() != ReserverWords::RIGHT_SQUARE_BRACKET) {
+		std::cout << "ERROR! ']' expected, but got " << dimensionChilds.at(3)->getStringData() << std::endl;
+		return nullptr;
+	}
 
-	return caseExpression(diemnsionChilds.at(1));
+	if (dimensionChilds.at(1)->getRule() != Rules::EXPRESSION) {
+		std::cout << "ERROR! 2-nd child of <dimension> must be EXPRESSION, but got " << dimensionChilds.at(1)->getRule() << std::endl;
+		return nullptr;
+	}
+
+	return caseExpression(dimensionChilds.at(1), true);
 }
 
-Tree::TreeItem* Translator::caseVariable(Tree::TreeItem* item) {
+Expression* Translator::caseVariable(Tree::TreeItem* item, bool onlyIntegerValues) {
 	if (item->getRule() != VARIABLE) {
 		std::cout << "ERROR! VARIABLE expected, but got " << item->getRule() << std::endl;
 		return nullptr;
@@ -316,18 +378,28 @@ Tree::TreeItem* Translator::caseVariable(Tree::TreeItem* item) {
 		return nullptr;
 	}
 
-	Tree::TreeItem* variableIdentifier = caseVariableIdentifier(variableChilds.at(0));
+	Tree::TreeItem* variableIdentifier = caseVariableIdentifier(variableChilds.at(0), false);
 	if (variableIdentifier == nullptr) return nullptr;
 
-	//TODO: somehow convert to Tree:TreeItem this result and than parse it
-	// maybe add some functions to encypt this expression-with-dimension to Tree::TreeItem and decrypt again
-	// and add to Rule.h EXPRESSION_WITH_DIMENSSION
-	Tree::TreeItem* dimension = caseDimension(variableChilds.at(1));
-	//TODO: do here something
-	return nullptr;
+	Expression* dimension = caseDimension(variableChilds.at(1));
+	if (dimension == nullptr) return nullptr;
+	if (dimension->getType() != Expression::ExpressionType::EMPTY && !isIdentifierIsRange(variableIdentifier->getData())) {
+		std::cout << "ERROR! operator [..] can use only for RANGE type, but " << variableIdentifier->getStringData() << " is not type of range." << std::endl;
+		return nullptr;
+	}
+	
+	if (dimension->getType() == Expression::ExpressionType::EMPTY) {
+		if (onlyIntegerValues && !isIdentifierIsInteger(variableIdentifier->getData())) {
+			std::cout << "ERROR! INSIDE [ ] can be only INTEGER VARIABLE, but got " << variableIdentifier->getStringData() << std::endl;
+			return nullptr;
+		}
+		return new Expression(variableIdentifier->getStringData(), variableIdentifier->getData(), Expression::ExpressionType::VARIABLE);
+	}
+
+	return new Expression(variableIdentifier->getStringData(), variableIdentifier->getData(), Expression::ExpressionType::VARIABLE, dimension);
 }
 
-Tree::TreeItem* Translator::caseVariableIdentifier(Tree::TreeItem* item) {
+Tree::TreeItem* Translator::caseVariableIdentifier(Tree::TreeItem* item, bool isIgnoreCreationCheck) {
 	if (item->getRule() != VARIABLE_IDENTIFIER) {
 		std::cout << "ERROR! Expected VARIABLE_IDENTIFIER, but got " << item->getRule() << std::endl;
 		return nullptr;
@@ -339,10 +411,10 @@ Tree::TreeItem* Translator::caseVariableIdentifier(Tree::TreeItem* item) {
 		return nullptr;
 	}
 
-	return caseIdentifier(variableIdentifierChilds.at(0));
+	return caseIdentifier(variableIdentifierChilds.at(0), isIgnoreCreationCheck);
 }
 
-Tree::TreeItem* Translator::caseIdentifier(Tree::TreeItem* item) {
+Tree::TreeItem* Translator::caseIdentifier(Tree::TreeItem* item, bool ignoreCreationCheck) {
 	if (item->getRule() != IDENTIFIER_RULE) {
 		std::cout << "ERROR! Expected IDENTIFIER_RULE, but got " << item->getRule() << std::endl;
 		return nullptr;
@@ -361,6 +433,11 @@ Tree::TreeItem* Translator::caseIdentifier(Tree::TreeItem* item) {
 		return nullptr;
 	}
 
+	if (!ignoreCreationCheck && !isIdentifierDeclarated(identifier->getData())) {
+		std::cout << "ERROR! Identifier " << identifier->getStringData() << " IS NOT DECLARATED!" << std::endl;
+		return nullptr;
+	}
+
 	return identifier;
 }
 
@@ -374,7 +451,7 @@ Tree::TreeItem* Translator::caseAttribtue(Tree::TreeItem* item) {
 	std::vector<Tree::TreeItem*> attributeChilds = item->getChilds();
 
 	if (attributeChilds.size() == 1) {
-		if (attributeChilds.at(0)->getData() == 405 || attributeChilds.at(0)->getData() == 408) {
+		if (attributeChilds.at(0)->getData() == FLOAT || attributeChilds.at(0)->getData() == INTEGER) {
 			return attributeChilds.at(0);
 		} else {
 			std::cout << "ERROR! <attribute> with 1 child must have INTEGER or FLOAT as chold, but got " << attributeChilds.at(0)->getRule() << std::endl;
@@ -436,7 +513,7 @@ Tree::TreeItem* Translator::caseRange(Tree::TreeItem* item) {
 	if (from == nullptr) return nullptr;
 
 	Tree::TreeItem* divider = rangeChilds.at(1);
-	if (divider->getData() != 302) {
+	if (divider->getData() != DOUBLE_DOT) {
 		std::cout << "ERROR! Expected .., but got " << divider->getStringData() << std::endl;
 		return nullptr;
 	}
@@ -445,7 +522,7 @@ Tree::TreeItem* Translator::caseRange(Tree::TreeItem* item) {
 	if (to == nullptr) return nullptr;
 	//TODO: add childs as i need
 	std::string str = from->getStringData() + " " + divider->getStringData() + " " + to->getStringData();
-	return new Tree::TreeItem(str, RANGE, -1);
+	return new Tree::TreeItem(str, Rules::RANGE, DOUBLE_DOT);
 }
 
 Tree::TreeItem* Translator::caseUnsignedInteger(Tree::TreeItem* item) {
@@ -468,6 +545,25 @@ Tree::TreeItem* Translator::caseUnsignedInteger(Tree::TreeItem* item) {
 	}
 
 	return integer;
+}
+
+Identifier::IdentifierType Translator::convertFromCode(int code, bool empty) {
+	if (empty) return Identifier::IdentifierType::EMPTY;
+
+	if (code == ReserverWords::DOUBLE_DOT) {
+		return Identifier::IdentifierType::RANGE;
+	}
+	
+	if (code == ReserverWords::INTEGER) {
+		return Identifier::IdentifierType::INTEGER;
+	}
+	
+	if (code == ReserverWords::FLOAT) {
+		return Identifier::IdentifierType::FLOAT;
+	}
+
+	std::cout << "ERROR! Cannot convert to IdentifierType code " << code << std::endl;
+	return Identifier::IdentifierType::EMPTY;
 }
 
 void Translator::startDataSegment(){

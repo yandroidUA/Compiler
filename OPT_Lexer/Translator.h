@@ -1,6 +1,7 @@
 #pragma once
 #include "Tree.h"
-
+#include "Identifier.h"
+#include "Expression.h"
 
 class Translator {
 public:
@@ -13,10 +14,16 @@ public:
 private:
 	Tree* tree;
 	int loopLabelCounter = 0;
-	std::vector<int> declaratedIdentifiers;
+	std::vector<Identifier> declaratedIdentifiers;
 
 	// check if identififer with code param is contains in declaratedIdentifiers
 	bool isIdentifierDeclarated(int);
+
+	bool isIdentifierIsRange(int);
+
+	bool isIdentifierIsInteger(int);
+
+	void addIdentifier(Identifier);
 
 	void analyze(Tree::TreeItem*, std::string&);
 
@@ -52,16 +59,15 @@ private:
 
 	bool caseStatementExpression(Tree::TreeItem*);
 
-	//TODO: expression must return more that 1 Tree::TreeItem* it must return type variable or unsigned integer and something else
-	Tree::TreeItem* caseExpression(Tree::TreeItem*);
-	//TODO: dimension must return more that 1 Tree::TreeItem* it must return type variable or unsigned integer and something else
-	Tree::TreeItem* caseDimension(Tree::TreeItem*);
+	Expression* caseExpression(Tree::TreeItem*, bool);
 
-	Tree::TreeItem* caseVariable(Tree::TreeItem*);
+	Expression* caseDimension(Tree::TreeItem*);
 
-	Tree::TreeItem* caseVariableIdentifier(Tree::TreeItem*);
+	Expression* caseVariable(Tree::TreeItem*, bool);
 
-	Tree::TreeItem* caseIdentifier(Tree::TreeItem*);
+	Tree::TreeItem* caseVariableIdentifier(Tree::TreeItem*, bool);
+
+	Tree::TreeItem* caseIdentifier(Tree::TreeItem*, bool);
 
 	Tree::TreeItem* caseAttribtue(Tree::TreeItem*);
 
@@ -74,5 +80,10 @@ private:
 
 	Tree::TreeItem* caseUnsignedInteger(Tree::TreeItem*);
 
+	Identifier::IdentifierType convertFromCode(int, bool);
+
+
+	// for translator rule 14. <dimension> --> [ <expression> ] | <empty>, should be rewriten as:
+	// 14. <dimension> --> [ <variable-identifier> ] | <empty>
 };
 

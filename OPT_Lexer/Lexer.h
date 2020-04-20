@@ -51,11 +51,11 @@ private:
 	// invoke addTokenToResult to add token to result vector
 	void addToken(std::string&);
 	// add param of func to reservedWords
-	void addReservedWord(const char*);
+	void addReservedWord(const char*, int);
 	// add param of func to oneSeparatedTokensMap
-	void addOneSeparatedToken(const char*);
+	void addOneSeparatedToken(const char*, int);
 	// add param of func to multiSeparatedTokensMap
-	void addMultiSeparatedToken(const char*);
+	void addMultiSeparatedToken(const char*, int);
 	// add token to identifiersTokensMap, returns code of just added identifier
 	int addIdentifier(std::string&);
 	// add token to constantTokensMap, returns code of just added constant
