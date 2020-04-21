@@ -88,5 +88,9 @@ private:
 	
 	std::string generatePrepareRightExpression(Expression*, bool);
 
+	//TODO:
+	// added generation into file
+	// wtite all data into 2 strings (DATA SEGMENT string, CODE SEGMENT string) and than just print into files 2 strings
+
 };
 
