@@ -1,17 +1,23 @@
 #pragma once
 #include <string>
-#include "Identifier.h"
 
 class Attribute {
 public:
-	Attribute(Identifier::IdentifierType type) {
+	enum IdentifierType {
+		INTEGER,
+		FLOAT,
+		RANGE,
+		EMPTY
+	};
+
+	Attribute(IdentifierType type) {
 		this->type = type;
 	};
 
 	virtual ~Attribute() = default;
 
-	inline Identifier::IdentifierType getType() const { return type; }
+	inline IdentifierType getType() { return type; }
 
 protected:
-	Identifier::IdentifierType type;
+	IdentifierType type;
 };

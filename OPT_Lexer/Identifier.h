@@ -1,20 +1,14 @@
 #pragma once
 #include <string>
+#include "Attribute.h"
 
 class Identifier {
 public:
-	
-	enum IdentifierType {
-		INTEGER,
-		FLOAT,
-		RANGE,
-		EMPTY
-	};
 
-	Identifier(std::string name, int code, IdentifierType type) {
+	Identifier(std::string name, int code, Attribute* attribute) {
 		this->name = name;
 		this->code = code;
-		this->type = type;
+		this->attribute = attribute;
 	};
 
 	~Identifier() = default;
@@ -23,10 +17,12 @@ public:
 
 	inline std::string getName() const { return name; }
 
-	inline IdentifierType getType() { return type; }
+	inline Attribute::IdentifierType getType() { return attribute->getType(); }
+
+	inline Attribute* getAttribute() const { return attribute; }
 
 protected:
 	int code;
 	std::string name;
-	IdentifierType type;
+	Attribute* attribute;
 };

@@ -3,7 +3,7 @@
 
 class RangeAttribute : public Attribute {
 public:
-	RangeAttribute(int from, int to) : Attribute(Identifier::IdentifierType::RANGE) {
+	RangeAttribute(int from, int to) : Attribute(Attribute::IdentifierType::RANGE) {
 		this->from = from;
 		this->to = to;
 	};

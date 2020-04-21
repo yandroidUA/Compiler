@@ -8,7 +8,7 @@
 std::string getOutputPath(std::string& inputPath);
 
 int main() {
-    std::string analyzingFile = "tests//test09/input.sig";
+    std::string analyzingFile = "tests//test01/input.sig";
     std::string outputFile = getOutputPath(analyzingFile);
     Lexer lexer;
     Lexer::AnalyzeResult lexerAnalyzerResult = lexer.scanFile(analyzingFile);

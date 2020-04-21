@@ -29,7 +29,7 @@ bool Translator::isIdentifierDeclarated(int identifierCode) {
 bool Translator::isIdentifierIsRange(int code) {
 	for (auto& identifier : declaratedIdentifiers) {
 		if (identifier.getCode() == code) {
-			return identifier.getType() == Identifier::IdentifierType::RANGE;
+			return identifier.getType() == Attribute::IdentifierType::RANGE;
 		}
 	}
 	return false;
@@ -38,7 +38,7 @@ bool Translator::isIdentifierIsRange(int code) {
 bool Translator::isIdentifierIsInteger(int code) {
 	for (auto& identifier : declaratedIdentifiers) {
 		if (identifier.getCode() == code) {
-			return identifier.getType() == Identifier::IdentifierType::INTEGER;
+			return identifier.getType() == Attribute::IdentifierType::INTEGER;
 		}
 	}
 	return false;
@@ -71,6 +71,7 @@ void Translator::caseProgram(Tree::TreeItem* item) {
 
 	caseProcedureIdentifier(programChilds.at(0));
 	caseBlock(programChilds.at(1));
+	std::cout << "END" << std::endl;
 }
 
 void Translator::caseProcedureIdentifier(Tree::TreeItem* item) {
@@ -82,7 +83,7 @@ void Translator::caseProcedureIdentifier(Tree::TreeItem* item) {
 
 	//TODO: add more checks
 	Tree::TreeItem* identifier = procedureIdentifierChilds.at(0)->getChilds().at(0);
-	std::cout << "PROC " << identifier->getStringData() << std::endl;
+	procedureName = identifier->getStringData();
 }
 
 void Translator::caseBlock(Tree::TreeItem* item) {
@@ -103,10 +104,11 @@ void Translator::caseBlock(Tree::TreeItem* item) {
 		return;
 	}
 
-	//TODO: here generate CODE_SEGMENT
 	startCodeSegment();
+	std::cout << procedureName << " PROC" << std::endl;
 	caseStatementList(blockChilds.at(2));
-
+	std::cout << procedureName << " ENDP" << std::endl;
+	endCodeSegment();
 }
 
 bool Translator::caseVariableDeclarations(Tree::TreeItem* item) {
@@ -163,7 +165,7 @@ bool Translator::caseDeclaration(Tree::TreeItem* item) {
 	Attribute* attributeList = caseAttributeList(declarationChild.at(3));
 	if (attributeList == nullptr) return false;
 
-	attribute = attributeList->getType() == Identifier::IdentifierType::EMPTY ? attribute : attributeList;
+	attribute = attributeList->getType() == Attribute::IdentifierType::EMPTY ? attribute : attributeList;
 
 	//TODO: GENERATE HERE DECLARATION ASM
 	if (isIdentifierDeclarated(variable->getData())) {
@@ -171,7 +173,9 @@ bool Translator::caseDeclaration(Tree::TreeItem* item) {
 		return false;
 	}
 
-	addIdentifier(Identifier(variable->getStringData(), variable->getData(), attribute->getType()));
+	Identifier* identifier = new Identifier(variable->getStringData(), variable->getData(), attribute);
+	addIdentifier(*identifier);
+	generateAsm(identifier);
 
 	return true; 
 }
@@ -255,6 +259,7 @@ bool Translator::caseStatement(Tree::TreeItem* item) {
 
 bool Translator::caseStatementLoop(Tree::TreeItem* item) {
 	int currentLoopCounter = loopLabelCounter;
+	std::cout << "; LOOP" << std::endl;
 	std::cout << "?L" << loopLabelCounter << ": nop" << std::endl;
 	loopLabelCounter++;
 
@@ -267,7 +272,8 @@ bool Translator::caseStatementLoop(Tree::TreeItem* item) {
 		std::cout << "ERROR! ENDLOOP expected, but got " << statementLoopChilds.at(2)->getStringData() << std::endl;
 		return false;
 	}
-	
+
+	std::cout << "; ENDLOOP" << std::endl;
 	std::cout << "JMP ?L" << currentLoopCounter << std::endl;
 	std::cout << "?L" << loopLabelCounter << ": nop" << std::endl;
 	loopLabelCounter++;
@@ -291,9 +297,13 @@ bool Translator::caseStatementExpression(Tree::TreeItem* item) {
 	if (expression == nullptr) return false;
 
 	//TODO: simple print the statement
+	//TODO: generate ASM here
+	std::cout << "; ";
 	variable->print();
 	std::cout << " := ";
 	expression->print();
+	std::cout << std::endl;
+	generateAsm(variable, expression);
 
 	return true;
 }
@@ -450,9 +460,9 @@ Attribute* Translator::caseAttribtue(Tree::TreeItem* item) {
 
 	if (attributeChilds.size() == 1) {
 		if (attributeChilds.at(0)->getData() == FLOAT) {
-			return new Attribute(Identifier::IdentifierType::FLOAT);
+			return new Attribute(Attribute::IdentifierType::FLOAT);
 		} else if (attributeChilds.at(0)->getData() == INTEGER) {
-			return new Attribute(Identifier::IdentifierType::INTEGER);
+			return new Attribute(Attribute::IdentifierType::INTEGER);
 		} else {
 			std::cout << "ERROR! <attribute> with 1 child must have INTEGER or FLOAT as chold, but got " << attributeChilds.at(0)->getRule() << std::endl;
 			return nullptr;
@@ -477,7 +487,7 @@ Attribute* Translator::caseAttributeList(Tree::TreeItem* item) {
 
 	if (attributeListChilds.size() == 1) {
 		if (attributeListChilds.at(0)->getRule() == EMPTY) {
-			return new Attribute(Identifier::IdentifierType::EMPTY);
+			return new Attribute(Attribute::IdentifierType::EMPTY);
 		} else {
 			std::cout << "ERROR! <attribute-list> with childs count 1 MUST have only EMPTY child" << std::endl;
 			return nullptr;
@@ -494,7 +504,7 @@ Attribute* Translator::caseAttributeList(Tree::TreeItem* item) {
 
 	Attribute* attributeList = caseAttributeList(attributeListChilds.at(1));
 
-	return attributeList->getType() == Identifier::IdentifierType::EMPTY ? attribute : attributeList;
+	return attributeList->getType() == Attribute::IdentifierType::EMPTY ? attribute : attributeList;
 }
 
 RangeAttribute* Translator::caseRange(Tree::TreeItem* item) {
@@ -522,7 +532,7 @@ RangeAttribute* Translator::caseRange(Tree::TreeItem* item) {
 	if (to == nullptr) return nullptr;
 	//TODO: add childs as i need
 	std::string str = from->getStringData() + " " + divider->getStringData() + " " + to->getStringData();
-	return new RangeAttribute(from->getData(), to->getData());
+	return new RangeAttribute(std::stoi(from->getStringData()), std::stoi(to->getStringData()));
 }
 
 Tree::TreeItem* Translator::caseUnsignedInteger(Tree::TreeItem* item) {
@@ -547,23 +557,66 @@ Tree::TreeItem* Translator::caseUnsignedInteger(Tree::TreeItem* item) {
 	return integer;
 }
 
-Identifier::IdentifierType Translator::convertFromCode(int code, bool empty) {
-	if (empty) return Identifier::IdentifierType::EMPTY;
+void Translator::generateAsm(Identifier* identifier) {
+	switch (identifier->getType()) {
+	case Attribute::IdentifierType::RANGE:
+		std::cout << identifier->getName() << " dw ";
+		if (RangeAttribute* attribute = dynamic_cast<RangeAttribute*>(identifier->getAttribute())) {
+			int start = attribute->getFrom() > attribute->getTo() ? attribute->getTo() : attribute->getFrom();
+			int end = attribute->getFrom() < attribute->getTo() ? attribute->getTo() : attribute->getFrom();
+			for (int from = start; from <= end; from++) {
+				std::cout << from;
+				if (from != attribute->getTo()) {
+					std::cout << ", ";
+				}
+			}
+			std::cout << std::endl;
+		}
+		break;
+	case Attribute::IdentifierType::FLOAT:
+		std::cout << identifier->getName() << " dd ?" << std::endl;
+		break;
+	case Attribute::IdentifierType::INTEGER:
+		std::cout << identifier->getName() << " dw ?" << std::endl;
+		break;
+	}
+}
 
-	if (code == ReserverWords::DOUBLE_DOT) {
-		return Identifier::IdentifierType::RANGE;
-	}
-	
-	if (code == ReserverWords::INTEGER) {
-		return Identifier::IdentifierType::INTEGER;
-	}
-	
-	if (code == ReserverWords::FLOAT) {
-		return Identifier::IdentifierType::FLOAT;
+void Translator::generateAsm(Expression* left, Expression* right) {
+	std::string leftStr = generatePrepareLeftExpression(left, true);
+	std::string rightStr = generatePrepareRightExpression(right, true);
+	std::cout << leftStr << ", " << rightStr << std::endl;
+}
+
+std::string Translator::generatePrepareLeftExpression(Expression* expression, bool isLastStatement) {
+	if (expression->getDimension() == nullptr && isLastStatement) {
+		return "MOV " + expression->getName();
+	} else if (expression->getDimension() == nullptr) {
+		return "MOV BX, " + expression->getName() + "\n";
 	}
 
-	std::cout << "ERROR! Cannot convert to IdentifierType code " << code << std::endl;
-	return Identifier::IdentifierType::EMPTY;
+	std::cout << generatePrepareLeftExpression(expression->getDimension(), false);
+
+	if (isLastStatement) {
+		return "MOV " + expression->getName() + "[BX]";
+	} else {
+		return "MOV BX, " + expression->getName() + "[BX]\n";
+	}
+
+}
+
+std::string Translator::generatePrepareRightExpression(Expression* expression, bool isLastStatement) {
+	if (expression->getDimension() == nullptr && isLastStatement) {
+		std::cout << "MOV BP, " + expression->getName() << std::endl;
+		return "BP";
+	} else if (expression->getDimension() == nullptr) {
+		std::cout << "MOV BP, " << expression->getName() << std::endl;
+		return "BP";
+	}
+
+	generatePrepareRightExpression(expression->getDimension(), false);
+	std::cout << "MOV BP, " << expression->getName() + "[BP]" << std::endl;
+	return "BP";
 }
 
 void Translator::startDataSegment(){

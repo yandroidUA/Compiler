@@ -16,6 +16,7 @@ public:
 private:
 	Tree* tree;
 	int loopLabelCounter = 0;
+	std::string procedureName;
 	std::vector<Identifier> declaratedIdentifiers;
 
 	// check if identififer with code param is contains in declaratedIdentifiers
@@ -79,7 +80,13 @@ private:
 
 	Tree::TreeItem* caseUnsignedInteger(Tree::TreeItem*);
 
-	Identifier::IdentifierType convertFromCode(int, bool);
+	void generateAsm(Identifier*);
+
+	void generateAsm(Expression*, Expression*);
+
+	std::string generatePrepareLeftExpression(Expression*, bool);
+	
+	std::string generatePrepareRightExpression(Expression*, bool);
 
 };
 
