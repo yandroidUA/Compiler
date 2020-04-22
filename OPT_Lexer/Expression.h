@@ -42,6 +42,11 @@ public:
 		std::cout << "]";
 	}
 
+	std::string getVariableForPrint() {
+		if (dimension == nullptr) return name;
+		return name + "[" + dimension->getVariableForPrint() + "]";
+	}
+
 private:
 	std::string name;
 	int code;

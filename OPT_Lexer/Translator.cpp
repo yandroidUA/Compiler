@@ -9,10 +9,8 @@ Translator::Translator(Tree* tree) {
 	this->tree = tree;
 }
 
-void Translator::analyze(std::string) {
+void Translator::analyze() {
 	tree->switchTo(tree->getRoot());
-//	startCodeSegment();
-//	startDataSegment();
 	analyze(tree->getRoot(), dataSegmentString);
 }
 
@@ -103,12 +101,16 @@ void Translator::caseBlock(Tree::TreeItem* item) {
 		std::cout << "ERROR! BEGIN expected, but got " << blockChilds.at(1)->getStringData() << std::endl;
 		return;
 	}
-
+	endDataSegment();
 	startCodeSegment();
 	std::cout << procedureName << " PROC" << std::endl;
+	assemblerProgram += procedureName + " PROC\n";
 	caseStatementList(blockChilds.at(2));
+	assemblerProgram += procedureName + " ENDP\n";
 	std::cout << procedureName << " ENDP" << std::endl;
 	endCodeSegment();
+	std::cout << "END" << std::endl;
+	assemblerProgram += "END\n";
 }
 
 bool Translator::caseVariableDeclarations(Tree::TreeItem* item) {
@@ -167,7 +169,6 @@ bool Translator::caseDeclaration(Tree::TreeItem* item) {
 
 	attribute = attributeList->getType() == Attribute::IdentifierType::EMPTY ? attribute : attributeList;
 
-	//TODO: GENERATE HERE DECLARATION ASM
 	if (isIdentifierDeclarated(variable->getData())) {
 		std::cout << "ERROR! " << variable->getStringData() << " already declarated!" << std::endl;
 		return false;
@@ -190,7 +191,6 @@ bool Translator::caseDeclarationList(Tree::TreeItem* item) {
 
 	if (declarationListChilds.size() == 1) {
 		if (declarationListChilds.at(0)->getRule() == EMPTY) {
-			std::cout << "nop" << std::endl;
 			return true;
 		} else {
 			std::cout << "ERROR! <declaration-list> with 1 child MUST have EMPTY child" << std::endl;
@@ -218,6 +218,7 @@ bool Translator::caseStatementList(Tree::TreeItem* item) {
 	if (statementListChild.size() == 1) {
 		if (statementListChild.at(0)->getRule() == EMPTY) {
 			std::cout << "nop" << std::endl;
+			assemblerProgram += "\tnop\n";
 			return true;
 		} else {
 			std::cout << "ERROR! If <statement-list> has 1 child it MUST be EMPTY, but got " << statementListChild.at(0)->getRule() << std::endl;
@@ -260,6 +261,8 @@ bool Translator::caseStatement(Tree::TreeItem* item) {
 bool Translator::caseStatementLoop(Tree::TreeItem* item) {
 	int currentLoopCounter = loopLabelCounter;
 	std::cout << "; LOOP" << std::endl;
+	assemblerProgram += "\t\t; LOOP\n";
+	assemblerProgram += "?L" + std::to_string(loopLabelCounter) + ": nop\n";
 	std::cout << "?L" << loopLabelCounter << ": nop" << std::endl;
 	loopLabelCounter++;
 
@@ -274,8 +277,10 @@ bool Translator::caseStatementLoop(Tree::TreeItem* item) {
 	}
 
 	std::cout << "; ENDLOOP" << std::endl;
+	assemblerProgram += "\t\t; ENDLOOP\n";
+	assemblerProgram += "\tJMP ?L" + std::to_string(currentLoopCounter) + "\n\tnop\n";
 	std::cout << "JMP ?L" << currentLoopCounter << std::endl;
-	std::cout << "?L" << loopLabelCounter << ": nop" << std::endl;
+	std::cout << "?L" << loopLabelCounter << std::endl << "nop" << std::endl;
 	loopLabelCounter++;
 
 	return true;
@@ -296,8 +301,7 @@ bool Translator::caseStatementExpression(Tree::TreeItem* item) {
 	Expression* expression = caseExpression(statementExpressionsChild.at(2), false);
 	if (expression == nullptr) return false;
 
-	//TODO: simple print the statement
-	//TODO: generate ASM here
+	assemblerProgram += "\t\t; " + variable->getVariableForPrint() + " := " + expression->getVariableForPrint() + "\n";
 	std::cout << "; ";
 	variable->print();
 	std::cout << " := ";
@@ -530,7 +534,7 @@ RangeAttribute* Translator::caseRange(Tree::TreeItem* item) {
 
 	Tree::TreeItem* to = caseUnsignedInteger(rangeChilds.at(2));
 	if (to == nullptr) return nullptr;
-	//TODO: add childs as i need
+
 	std::string str = from->getStringData() + " " + divider->getStringData() + " " + to->getStringData();
 	return new RangeAttribute(std::stoi(from->getStringData()), std::stoi(to->getStringData()));
 }
@@ -561,23 +565,29 @@ void Translator::generateAsm(Identifier* identifier) {
 	switch (identifier->getType()) {
 	case Attribute::IdentifierType::RANGE:
 		std::cout << identifier->getName() << " dw ";
+		assemblerProgram += "\t" + identifier->getName() + " dw ";
 		if (RangeAttribute* attribute = dynamic_cast<RangeAttribute*>(identifier->getAttribute())) {
 			int start = attribute->getFrom() > attribute->getTo() ? attribute->getTo() : attribute->getFrom();
 			int end = attribute->getFrom() < attribute->getTo() ? attribute->getTo() : attribute->getFrom();
 			for (int from = start; from <= end; from++) {
+				assemblerProgram += std::to_string(from);
 				std::cout << from;
 				if (from != attribute->getTo()) {
 					std::cout << ", ";
+					assemblerProgram += ", ";
 				}
 			}
+			assemblerProgram += "\n";
 			std::cout << std::endl;
 		}
 		break;
 	case Attribute::IdentifierType::FLOAT:
 		std::cout << identifier->getName() << " dd ?" << std::endl;
+		assemblerProgram += "\t" + identifier->getName() + " dd ?\n";
 		break;
 	case Attribute::IdentifierType::INTEGER:
 		std::cout << identifier->getName() << " dw ?" << std::endl;
+		assemblerProgram += "\t" + identifier->getName() + " dw ?\n";
 		break;
 	}
 }
@@ -586,21 +596,24 @@ void Translator::generateAsm(Expression* left, Expression* right) {
 	std::string leftStr = generatePrepareLeftExpression(left, true);
 	std::string rightStr = generatePrepareRightExpression(right, true);
 	std::cout << leftStr << ", " << rightStr << std::endl;
+	assemblerProgram += leftStr + ", " + rightStr + "\n";
 }
 
 std::string Translator::generatePrepareLeftExpression(Expression* expression, bool isLastStatement) {
 	if (expression->getDimension() == nullptr && isLastStatement) {
-		return "MOV " + expression->getName();
+		return "\tMOV " + expression->getName();
 	} else if (expression->getDimension() == nullptr) {
-		return "MOV BX, " + expression->getName() + "\n";
+		return "\tMOV BX, " + expression->getName() + "\n";
 	}
-
-	std::cout << generatePrepareLeftExpression(expression->getDimension(), false);
+	
+	std::string dimension = generatePrepareLeftExpression(expression->getDimension(), false);
+	std::cout << dimension;
+	assemblerProgram += dimension;
 
 	if (isLastStatement) {
-		return "MOV " + expression->getName() + "[BX]";
+		return "\tMOV " + expression->getName() + "[BX]";
 	} else {
-		return "MOV BX, " + expression->getName() + "[BX]\n";
+		return "\tMOV BX, " + expression->getName() + "[BX]\n";
 	}
 
 }
@@ -608,35 +621,45 @@ std::string Translator::generatePrepareLeftExpression(Expression* expression, bo
 std::string Translator::generatePrepareRightExpression(Expression* expression, bool isLastStatement) {
 	if (expression->getDimension() == nullptr && isLastStatement) {
 		std::cout << "MOV BP, " + expression->getName() << std::endl;
+		assemblerProgram += "\tMOV BP, " + expression->getName() + "\n";
 		return "BP";
 	} else if (expression->getDimension() == nullptr) {
 		std::cout << "MOV BP, " << expression->getName() << std::endl;
+		assemblerProgram += "\tMOV BP, " + expression->getName() + "\n";
 		return "BP";
 	}
 
 	generatePrepareRightExpression(expression->getDimension(), false);
 	std::cout << "MOV BP, " << expression->getName() + "[BP]" << std::endl;
+	assemblerProgram += "\tMOV BP, " + expression->getName() + "[BP]\n";
 	return "BP";
+}
+
+void Translator::dumpIntoFile(std::string filePath) {
+	std::ofstream file;
+	file.open(filePath);
+	file << assemblerProgram << std::endl;
+	file.close();
 }
 
 void Translator::startDataSegment(){
 	std::cout << "DATA SEGMENT" << std::endl;
-	dataSegmentString = "DATA SEGMENT\n";
+	assemblerProgram += "DATA SEGMENT\n";
 }
 
 void Translator::endDataSegment(){
 	std::cout << "DATA ENDS" << std::endl;
-	dataSegmentString += "DATA ENDS\n";
+	assemblerProgram += "DATA ENDS\n";
 }
 
 void Translator::startCodeSegment(){
 	std::cout << "CODE SEGMENT" << std::endl;
-	std::cout << "ASSUME CS:CODE DS:DATA" << std::endl;
-	codeSegmentString = "CODE SEGMENT\n";
-	codeSegmentString += "ASSUME CS:CODE DS:DATA\n";
+	std::cout << "ASSUME CS:CODE, DS:DATA" << std::endl;
+	assemblerProgram += "CODE SEGMENT\n";
+	assemblerProgram += "ASSUME CS:CODE, DS:DATA\n";
 }
 
 void Translator::endCodeSegment(){
 	std::cout << "CODE ENDS" << std::endl;
-	codeSegmentString += "CODE ENDS\n";
+	assemblerProgram += "CODE ENDS\n";
 }

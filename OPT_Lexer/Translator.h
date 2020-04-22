@@ -10,12 +10,14 @@ public:
 	// pass tree to translate as parametr to constructor
 	Translator(Tree*);
 
-	// param - is path to dump result file
-	void analyze(std::string);
+	void analyze();
+
+	void dumpIntoFile(std::string);
 
 private:
 	Tree* tree;
 	int loopLabelCounter = 0;
+	std::string assemblerProgram = "";
 	std::string procedureName;
 	std::vector<Identifier> declaratedIdentifiers;
 
@@ -87,10 +89,6 @@ private:
 	std::string generatePrepareLeftExpression(Expression*, bool);
 	
 	std::string generatePrepareRightExpression(Expression*, bool);
-
-	//TODO:
-	// added generation into file
-	// wtite all data into 2 strings (DATA SEGMENT string, CODE SEGMENT string) and than just print into files 2 strings
-
+		
 };
 
