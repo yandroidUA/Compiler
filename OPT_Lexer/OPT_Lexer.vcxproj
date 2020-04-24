@@ -150,14 +150,22 @@
     <ClCompile Include="Lexer.cpp" />
     <ClCompile Include="OPT_Lexer.cpp" />
     <ClCompile Include="SyntaxAnalyzer.cpp" />
+    <ClCompile Include="Translator.cpp" />
     <ClCompile Include="Tree.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Attribute.h" />
+    <ClInclude Include="Expression.h" />
+    <ClInclude Include="Identifier.h" />
     <ClInclude Include="Lexer.h" />
     <ClInclude Include="LexerResult.h" />
     <ClInclude Include="MultiSeparatedToken.h" />
+    <ClInclude Include="RangeAttribute.h" />
+    <ClInclude Include="ReservedWords.h" />
+    <ClInclude Include="Rules.h" />
     <ClInclude Include="SyntaxAnalyzer.h" />
     <ClInclude Include="TokenStatus.h" />
+    <ClInclude Include="Translator.h" />
     <ClInclude Include="Tree.h" />
   </ItemGroup>
   <ItemGroup>

@@ -1,3 +1,2 @@
-﻿  OPT_Lexer.cpp
-C:\Users\yanec\source\repos\Lexer_OPT\OPT_Lexer\OPT_Lexer.cpp(25,74): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
-  OPT_Lexer.vcxproj -> C:\Users\yanec\source\repos\Lexer_OPT\x64\Debug\OPT_Lexer.exe
+﻿  Translator.cpp
+  OPT_Lexer.vcxproj -> E:\GitHub\Lexer_OPT\x64\Debug\OPT_Lexer.exe

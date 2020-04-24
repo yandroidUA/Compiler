@@ -1,5 +1,7 @@
 #include "SyntaxAnalyzer.h"
 #include <fstream>
+#include "Rules.h"
+#include "ReservedWords.h"
 
 LexerResult nullableResult("", -1, -1, -1, -1);
 bool errorSyntaxHappened = false;
@@ -10,7 +12,7 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<LexerResult>& res) {
 }
 
 void SyntaxAnalyzer::analyze(){  
-	tree.addChild("<signal-program> --> <program>");
+	tree.addChild("<signal-program> --> <program>", SIGNAL_PROGRAM, -1);
 	if (caseProgram(0)) {
 		// tree.print();
 	}
@@ -28,6 +30,10 @@ void SyntaxAnalyzer::dumpTreeIntoFile(std::string& filename, std::string startTe
 
 	tree.dumpIntoFile(file);
 	file.close();
+}
+
+Tree* SyntaxAnalyzer::getResultTree() {
+	return &tree;
 }
 
 LexerResult SyntaxAnalyzer::getItem(int index){
@@ -54,24 +60,24 @@ void SyntaxAnalyzer::handleError(const char* message, LexerResult failedItem) {
 
 // 2. < program > --> PROGRAM <procedure - identifier>;
 bool SyntaxAnalyzer::caseProgram(int index) {
-	Tree::TreeItem* it = tree.addNext("<program> --> PROGRAM <procedure-identifier>;< block > .");
+	Tree::TreeItem* it = tree.addNext("<program> --> PROGRAM <procedure-identifier>;< block > .",  PROGRAM_RULE, -1);
 	
-	if (getItem(index).getCode() != 401) {
+	if (getItem(index).getCode() != PROGRAM) {
 		handleError("PROGRAM expected", getItem(index));
 		return false;
 	}
 
-	tree.addNext("<procedure-identifier> --> <identifier>");
+	tree.addNext("<procedure-identifier> --> <identifier>", PROCEDURE_IDENTIFIER, -1);
 	LexerResult nextItem = caseIdentifier(index + 1);
 	tree.switchTo(it);
 
 	if (errorSyntaxHappened) return false;
 
-	if (nextItem.getCode() != 1) {
+	if (nextItem.getCode() != SEMI_COLON) {
 		handleError("; expected", nextItem);
 		return false;
 	}
-	tree.addNext("<block> --> <variable-declarations> BEGIN <statements-list> END");
+	tree.addNext("<block> --> <variable-declarations> BEGIN <statements-list> END", BLOCK, -1);
 	nextItem = caseBlock(nextItem.getIndexInResultVector() + 1);
 	return !errorSyntaxHappened;
 }
@@ -84,49 +90,49 @@ LexerResult SyntaxAnalyzer::caseBlock(int index) {
 	tree.switchTo(current);
 	if (errorSyntaxHappened) return nullableResult;
 
-	if (item.getCode() != 402) {
+	if (item.getCode() != BEGIN) {
 		handleError("BEGIN expected", item);
 		return nullableResult;
 	}
 
-	tree.addChild("402 - BEGIN");
-	item = caseStatementList(item.getIndexInResultVector() + 1, 403);
+	tree.addChild(item.getToken(), ADDING_RESERVED_WORD, BEGIN);
+	item = caseStatementList(item.getIndexInResultVector() + 1, END);
 
 	tree.switchTo(current);
 	if (errorSyntaxHappened) return nullableResult;
 
-	if (item.getCode() != 403) {
+	if (item.getCode() != END) {
 		handleError("END expected", item);
 		return nullableResult;
 	}
 
-	tree.addChild("403 - END");
+	tree.addChild(item.getToken(), ADDING_RESERVED_WORD, item.getCode());
 	return item;
 }
 
 // 4. <variable-declarations> --> VAR <declarations-list>|<empty>
 LexerResult SyntaxAnalyzer::caseVariableDeclarations(int index) {
 	Tree::TreeItem* it = tree.getCurrent();
-	tree.addNext("<variable-declarations> --> VAR <declarations-list>|<empty>");
+	tree.addNext("<variable-declarations> --> VAR <declarations-list>|<empty>", VARIABLE_DECLARATIONS, -1);
 	LexerResult item = getItem(index);
 
-	if (item.getCode() != 404) {
+	if (item.getCode() != VAR) {
 		handleError("VAR expected", getItem(index));
 		return nullableResult;
 	}
-	tree.addChild(404);
+	tree.addChild(item.getToken(), ADDING_RESERVED_WORD, item.getCode());
 	return caseDeclarationList(item.getIndexInResultVector() + 1, it);
 }
 
 // 5. <declarations-list> --> <declaration><declarations-list>|<empty>
 LexerResult SyntaxAnalyzer::caseDeclarationList(int index, Tree::TreeItem* root) {
-	tree.addNext("<declarations-list> --> <declaration><declarations-list>|<empty>");
+	tree.addNext("<declarations-list> --> <declaration><declarations-list>|<empty>", DECLARATIONS_LIST, -1);
 	Tree::TreeItem* it = tree.getCurrent();
 	LexerResult item = getItem(index);
 
 	// if begin it means that declaration-list is empty or ended
-	if (item.getCode() == 402) {
-		tree.addNext("<empty>");
+	if (item.getCode() == BEGIN) {
+		tree.addNext("<empty>", EMPTY, -1);
 		tree.switchTo(root);
 		return item;
 	}
@@ -140,20 +146,20 @@ LexerResult SyntaxAnalyzer::caseDeclarationList(int index, Tree::TreeItem* root)
 
 // 6. <declaration> --> <variable-identifier>:<attribute><attributes-list>;
 LexerResult SyntaxAnalyzer::caseDeclaration(int index) {
-	tree.addNext("<declaration> --><variable-identifier>:<attribute><attributes-list>;");
+	tree.addNext("<declaration> --><variable-identifier>:<attribute><attributes-list>;", DECLARATION, -1);
 	Tree::TreeItem* it = tree.getCurrent();
-	tree.addNext("<variable-identifier> --> <identifier>");
+	tree.addNext("<variable-identifier> --> <identifier>", VARIABLE_IDENTIFIER, -1);
 	LexerResult nextItem = caseIdentifier(index);
 	
 
 	if (errorSyntaxHappened) return nullableResult;
 
 	// nextItem has index + 1
-	if (nextItem.getCode() != 0) { // ':' code 0
+	if (nextItem.getCode() != COLON) { // ':' code 0
 		handleError("':' expected", nextItem);
 	}
 	tree.switchTo(it);
-	tree.addChild(0);
+	tree.addChild(nextItem.getToken(), ADDING_SEPARATED, COLON);
 	if (errorSyntaxHappened) return nullableResult;
 
 	// attribute for index + 2
@@ -168,42 +174,43 @@ LexerResult SyntaxAnalyzer::caseDeclaration(int index) {
 
 // 7. <attributes-list> --> <attribute> <attributes-list> | <empty>
 LexerResult SyntaxAnalyzer::caseAttributeList(int index) {
-	tree.addNext("<attributes-list> --> <attribute> <attributes-list> | <empty>");
+	tree.addNext("<attributes-list> --> <attribute> <attributes-list> | <empty>", ATTRIBUTES_LIST, -1);
 	Tree::TreeItem* it = tree.getCurrent();
 	LexerResult item = getItem(index);
 
-	if (item.getCode() == 1) { // ';' code 1
+	if (item.getCode() == SEMI_COLON) { // ';' code 1
 		// attributr-list is empty or ended
-		tree.addChild("<empty>");
+		tree.addChild("<empty>", EMPTY, -1);
 		return getItem(index + 1);
 	}
 
 	item = caseAttribute(index, it);
 	tree.switchTo(it);
-	return caseAttributeList(item.getIndexInResultVector() + 1);
+	return errorSyntaxHappened ? nullableResult : caseAttributeList(item.getIndexInResultVector());
 }
 
 // 8. < attribute > --> INTEGER | FLOAT | [<range>]
 LexerResult SyntaxAnalyzer::caseAttribute(int index, Tree::TreeItem* root) {
-	tree.addNext("< attribute > -- > INTEGER | FLOAT | [<range>]");
+	tree.addNext("< attribute > -- > INTEGER | FLOAT | [<range>]", ATTRIBUTE, -1);
 	 LexerResult item = getItem(index);
 
- 	 if (item.getCode() == 408 || item.getCode() == 405) {
-		 std::string str = std::to_string(item.getCode());
-		 tree.addChild(str);
+ 	 if (item.getCode() == INTEGER || item.getCode() == FLOAT) {
+		 tree.addChild(item.getToken(), ADDING_RESERVED_WORD, item.getCode());
 		 tree.switchTo(root);
 		 return getItem(index + 1);
 	 }
 
-	 if (item.getCode() == 2) { // '[' code 2
-		 tree.addChild(2);
+	 if (item.getCode() == LEFT_SQUARE_BRACKET) { // '[' code 2
+		 tree.addChild(item.getToken(), RANGE_SEPARATED_SYMBOL, item.getCode());
+		 Tree::TreeItem* it = tree.getCurrent();
 		 item = caseRange(index + 1);
 		 if (errorSyntaxHappened) return nullableResult;
-		 if (item.getCode() != 3) { // ']' code 3
+		 if (item.getCode() != RIGHT_SQUARE_BRACKET) { // ']' code 3
 			 handleError("expected ]", item);
 			 return nullableResult;
 		 }
-		 tree.addChild(3);
+		 tree.switchTo(it);
+		 tree.addChild(item.getToken(), RANGE_SEPARATED_SYMBOL, item.getCode());
 		 tree.switchTo(root);
 		 return getItem(item.getIndexInResultVector() + 1);
 	 }
@@ -215,7 +222,7 @@ LexerResult SyntaxAnalyzer::caseAttribute(int index, Tree::TreeItem* root) {
 
 // 9. <range> --> <unsigned-integer> .. <unsigned-integer>
 LexerResult SyntaxAnalyzer::caseRange(int index) {
-	tree.addNext("<range> --> <unsigned-integer> .. <unsigned-integer>");
+	tree.addNext("<range> --> <unsigned-integer> .. <unsigned-integer>", RANGE, -1);
 	Tree::TreeItem* it = tree.getCurrent();
 	LexerResult item = getItem(index);
 
@@ -223,38 +230,39 @@ LexerResult SyntaxAnalyzer::caseRange(int index) {
 		handleError("<unsigned - integer> expected", item);
 		return nullableResult;
 	}
-	tree.addNext("<unsigned-integer>");
-	tree.addChild(item.getCode());
+	tree.addNext("<unsigned-integer>", UNSIGNED_INTEGER, -1);
+	int code = item.getCode();
+	tree.addChild(item.getToken(), ADDING_CONSTANT, code);
 	tree.switchTo(it);
 	item = getItem(index + 1);
 
-	if (item.getCode() != 302) { // '..' code 302
+	if (item.getCode() != DOUBLE_DOT) { // '..' code 302
 		handleError(".. expected", item);
 		return nullableResult;
 	}
-	tree.addChild("302 - ..");
+	tree.addChild(item.getToken(), RANGE_SEPARATED_SYMBOL, DOUBLE_DOT);
 	item = getItem(index + 2);
 
 	if (item.getCode() < 501 || item.getCode() >= 1001) {
 		handleError("<unsigned - integer> expected", item);
 		return nullableResult;
 	}
-	tree.addNext("<unsigned-integer>");
-	tree.addChild(item.getCode());
+	tree.addNext("<unsigned-integer>", UNSIGNED_INTEGER, -1);
+	tree.addChild(item.getToken(), ADDING_CONSTANT, item.getCode());
 	tree.switchTo(it);
 	return getItem(index + 3);
 }
 
 // 10. <statements-list> --> <statement> <statements-list> | <empty>
 LexerResult SyntaxAnalyzer::caseStatementList(int index, int code) {
-	tree.addNext("<statements-list> --> <statement> <statements-list> | <empty>");
+	tree.addNext("<statements-list> --> <statement> <statements-list> | <empty>", STATEMENT_LIST, -1);
 	Tree::TreeItem* it = tree.getCurrent();
 	LexerResult item = getItem(index);
 
 	// if met END or ENDLOOP means 
 	// end
 	if (item.getCode() == code) {
-		tree.addNext("<empty>");
+		tree.addNext("<empty>", EMPTY, -1);
 		return item;
 	}
 
@@ -267,46 +275,46 @@ LexerResult SyntaxAnalyzer::caseStatementList(int index, int code) {
 
 // 11. <statement> --> <variable> := <expression> ; | LOOP <statements-list> ENDLOOP ;
 LexerResult SyntaxAnalyzer::caseStatement(int index) {
-	 tree.addNext("<statement> --> <variable> := <expression> ; | LOOP <statements-list> ENDLOOP;");
+	 tree.addNext("<statement> --> <variable> := <expression> ; | LOOP <statements-list> ENDLOOP;", STATEMENT, -1);
 	 LexerResult item = getItem(index);
 	 Tree::TreeItem* current = tree.getCurrent();
 
 	 if (item.getCode() >= 1001) {
 		 // variable 
 		 item = caseVariable(item.getIndexInResultVector());
-		 if (item.getCode() != 301) {
+		 if (item.getCode() != EQUALS) {
 			 handleError(":= expected", item);
 			 return nullableResult;
 		 }
 		 tree.switchTo(current);
-		 tree.addChild("301 - :=");
+		 tree.addChild(item.getToken(), ADDING_RESERVED_WORD, item.getCode());
 		 item = caseExpression(item.getIndexInResultVector() + 1);
 
 		 if (errorSyntaxHappened) return nullableResult;
 
 	 } else {
 		 // LOOP
-		 if (item.getCode() != 406) { // LOOP - 406
+		 if (item.getCode() != LOOP) { // LOOP - 406
 			 handleError("LOOP expected", item);
 			 return nullableResult;
 		 }
-		 tree.addChild("406 - LOOP");
-		 item = caseStatementList(item.getIndexInResultVector() + 1, 407);
+		 tree.addChild(item.getToken(), ADDING_RESERVED_WORD, item.getCode());
+		 item = caseStatementList(item.getIndexInResultVector() + 1, ENDLOOP);
 		 tree.switchTo(current);
 		
 		 if (errorSyntaxHappened) return nullableResult;
 
-		 if (item.getCode() != 407) { //ENDLOOP - 407
+		 if (item.getCode() != ENDLOOP) { //ENDLOOP - 407
 			 handleError("ENDLOOP expected", item);
 			 return nullableResult;
 		 }
-		 tree.addChild("407 - ENDLOOP");
+		 tree.addChild(item.getToken(), ADDING_RESERVED_WORD, item.getCode());
 		 item = getItem(item.getIndexInResultVector() + 1);
 	 }
 	 tree.switchTo(current);
-	 if (item.getCode() == 1) { // ';' code 1
+	 if (item.getCode() == SEMI_COLON) { // ';' code 1
 		// attributr-list is empty or ended
-		 tree.addChild("1 - ;");
+		 tree.addChild(item.getToken(), ADDING_SEPARATED, item.getCode());
 		 return getItem(item.getIndexInResultVector() + 1);
 	 }
 	
@@ -317,13 +325,12 @@ LexerResult SyntaxAnalyzer::caseStatement(int index) {
 
 // 12. <expression> --> <variable> | <unsigned-integer>
 LexerResult SyntaxAnalyzer::caseExpression(int index) {
-	tree.addNext("<expression> --> <variable> | <unsigned-integer>");
+	tree.addNext("<expression> --> <variable> | <unsigned-integer>", EXPRESSION, -1);
 	LexerResult item = getItem(index);
 
 	if (item.getCode() >= 501 && item.getCode() < 1001) {
-		tree.addNext("<unsigned-integer>");
-		std::string str = std::to_string(item.getCode());
-		tree.addChild(str);
+		tree.addNext("<unsigned-integer>", UNSIGNED_INTEGER, -1);
+		tree.addChild(item.getToken(), ADDING_CONSTANT, item.getCode());
 		return getItem(index + 1);
 	}
 
@@ -336,48 +343,59 @@ LexerResult SyntaxAnalyzer::caseExpression(int index) {
 
 // 13. <variable> --> <variable-identifier><dimension>
 LexerResult SyntaxAnalyzer::caseVariable(int index) {
-	 LexerResult item = caseIdentifier(index);
+	Tree::TreeItem* cur = tree.getCurrent();
+	Tree::TreeItem* it = tree.addNext("<variable> --> <variable-identifier><dimension>", VARIABLE, -1);
+	
+	LexerResult item = caseVariableIdentifier(index);
+	tree.switchTo(it);
+	if (errorSyntaxHappened) return nullableResult;
 
-	 if (errorSyntaxHappened) return nullableResult;
+	if (item.getCode() == LEFT_SQUARE_BRACKET) {
+		item = caseDimension(item.getIndexInResultVector());
+		if (errorSyntaxHappened) return nullableResult;
+		return item;
+	} else {
+		tree.addNext("<dimension> --> [ <expression> ] | <empty>", DIMENSION, -1);
+		tree.addChild("<empty>", EMPTY, -1);
+	}
+	tree.switchTo(cur);
+	return item;
+}
 
-	 if (item.getCode() == 2) {
-		 item = caseDimension(item.getIndexInResultVector());
-		 if (errorSyntaxHappened) return nullableResult;
-		 return item;
-	 }
-
-	 return item;
- }
+LexerResult SyntaxAnalyzer::caseVariableIdentifier(int index) {
+	tree.addNext("<variable-identifier> --> <identifier>", VARIABLE_IDENTIFIER, -1);
+	return caseIdentifier(index);
+}
 
 // 14. <dimension> --> [ <expression> ] | <empty>
 LexerResult SyntaxAnalyzer::caseDimension(int index) {
+	tree.addNext("<dimension> --> [ <expression> ] | <empty>", DIMENSION, -1);
 	Tree::TreeItem* it = tree.getCurrent();
 	LexerResult item = getItem(index);
 
-	if (item.getCode() != 2) {
+	if (item.getCode() != LEFT_SQUARE_BRACKET) {
 		handleError("[ expected", item);
 		return nullableResult;
 	}
 
-	tree.addChild(2);
+	tree.addChild(item.getToken(), RANGE_SEPARATED_SYMBOL, LEFT_SQUARE_BRACKET);
 	item = caseExpression(item.getIndexInResultVector() + 1);
 	tree.switchTo(it);
 
-	if (item.getCode() != 3) {
+	if (item.getCode() != RIGHT_SQUARE_BRACKET) {
 		handleError("] expected", item);
 		return nullableResult;
 	}
 
-	tree.addChild(3);
+	tree.addChild(item.getToken(), RANGE_SEPARATED_SYMBOL, RIGHT_SQUARE_BRACKET);
 	return getItem(item.getIndexInResultVector() + 1);
 }
 
 // 16,16,17. <identifier> --> <letter><string>
 LexerResult SyntaxAnalyzer::caseIdentifier(int index) {
-	tree.addNext("<identifier> --> <letter><string>");
+	tree.addNext("<identifier> --> <letter><string>", IDENTIFIER_RULE, -1);
 	LexerResult item = getItem(index);
-	std::string str = std::to_string(item.getCode());
-	tree.addChild(str);
+	tree.addChild(item.getToken(), ADDING_INDENTIFIER, item.getCode());
 
 	if (item.getCode() >= 1001) {
 		return getItem(index + 1);
