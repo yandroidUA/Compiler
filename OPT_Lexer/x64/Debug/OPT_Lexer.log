@@ -1,2 +1,18 @@
-﻿  Translator.cpp
+﻿  Lexer.cpp
+E:\GitHub\Lexer_OPT\OPT_Lexer\Lexer.cpp(185,93): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+E:\GitHub\Lexer_OPT\OPT_Lexer\Lexer.cpp(189,93): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+E:\GitHub\Lexer_OPT\OPT_Lexer\Lexer.cpp(193,93): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+E:\GitHub\Lexer_OPT\OPT_Lexer\Lexer.cpp(197,93): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+E:\GitHub\Lexer_OPT\OPT_Lexer\Lexer.cpp(204,93): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+  OPT_Lexer.cpp
+E:\GitHub\Lexer_OPT\OPT_Lexer\OPT_Lexer.cpp(44,74): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+  SyntaxAnalyzer.cpp
+  Translator.cpp
+  Tree.cpp
+  Создание кода...
+E:\GitHub\Lexer_OPT\OPT_Lexer\Lexer.cpp(294): warning C4715: Lexer::caseMultiSeparated: значение возвращается не при всех путях выполнения
+E:\GitHub\Lexer_OPT\OPT_Lexer\Lexer.cpp(310): warning C4715: Lexer::caseOneSeparated: значение возвращается не при всех путях выполнения
+E:\GitHub\Lexer_OPT\OPT_Lexer\Lexer.cpp(337): warning C4715: Lexer::caseLetter: значение возвращается не при всех путях выполнения
+E:\GitHub\Lexer_OPT\OPT_Lexer\Lexer.cpp(362): warning C4715: Lexer::caseNumber: значение возвращается не при всех путях выполнения
+E:\GitHub\Lexer_OPT\OPT_Lexer\Lexer.cpp(410): warning C4715: Lexer::caseComment: значение возвращается не при всех путях выполнения
   OPT_Lexer.vcxproj -> E:\GitHub\Lexer_OPT\x64\Debug\OPT_Lexer.exe

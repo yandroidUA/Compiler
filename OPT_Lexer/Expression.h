@@ -11,23 +11,31 @@ public:
 		EMPTY
 	};
 
-	Expression(std::string name, int code, ExpressionType type) {
+	Expression(std::string name, int code, int line, int column, ExpressionType type) {
 		this->name = name;
 		this->code = code;
 		this->type = type;
+		this->line = line;
+		this->column = column;
 		this->dimension = nullptr;
 	};
 
-	Expression(std::string name, int code, ExpressionType type, Expression* dimension) {
+	Expression(std::string name, int code, int line, int column, ExpressionType type, Expression* dimension) {
 		this->name = name;
 		this->code = code;
 		this->type = type;
+		this->line = line;
+		this->column = column;
 		this->dimension = dimension;
 	};
 
 	inline ExpressionType getType() const { return type; }
 
 	inline int getCode() const { return code; }
+
+	inline int getLine() const { return line; }
+
+	inline int getColumn() const { return column; }
 
 	inline Expression* getDimension() { return dimension; }
 
@@ -50,6 +58,8 @@ public:
 private:
 	std::string name;
 	int code;
+	int line;
+	int column;
 	ExpressionType type;
 	Expression* dimension;
 };

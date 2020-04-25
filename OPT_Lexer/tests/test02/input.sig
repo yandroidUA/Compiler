@@ -1,19 +1,7 @@
 PROGRAM PR;
-	VAR A$:FLOAT;
-	VAR C 0 .. 10;
-	VAR B:FLOAT;
-	VAR B:FLOAT;
-	(*LOLOASDASKLDASDJALKSDJALKDLAKJdLASKdj****U*ASKDJAKSDHAD**ASDLJK*)
-	(*BEGIN asdasd
-	adlaskd;laskdla
-	alskdalskdjak
-	**********)
-	(asdasdasd****)
+   VAR A:FLOAT FLOAT INTEGER FLOAT INTEGER INTEGER FLOAT FLOAT [0 .. 55] [255 .. 33] INTEGER FLOAT FLOAT INTEGER;
+   C: [0 .. 10];
 BEGIN
-	LOOP 
-		C:=0;
-		A:=C;
-		A:=C[A];
-		A:=C[1];
-	ENDLOOP;
+	C[0] := A;
+	A := 0;
 END.

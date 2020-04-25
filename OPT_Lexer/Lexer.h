@@ -8,7 +8,17 @@
 
 class Lexer {
 private:
-	
+	// variables
+	int currentTokenState[6] = { 0, 0, 0, 0, 0, 0 };
+	std::string token = "";
+
+	int currentColumn = 0;
+	int currentRow = 1;
+	int savedColumn = currentColumn;
+	int savedRow = currentRow;
+	bool errorHappened = false;
+	std::string errorToken = "";
+
 	std::vector<int> lettersVector = {
 		'a', 'A', 'b', 'B', 'c', 'C', 'd', 'D', 'e', 'E', 'f', 'F', 'g', 'G', 'h', 'H',
 		'k', 'K', 'l', 'L', 'm', 'M', 'n', 'N', 'o', 'O', 'p', 'P', 'q', 'Q', 'r', 'R',

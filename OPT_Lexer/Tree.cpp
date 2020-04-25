@@ -7,38 +7,38 @@ Tree::Tree() {
 	this->depth = 0;
 }
 
-Tree::TreeItem* Tree::addChild(std::string data, Rules rules, int value) {
-	return add(data, rules, value, false);
+Tree::TreeItem* Tree::addChild(std::string data, int row, int column, Rules rules, int value) {
+	return add(data, row, column, rules, value, false);
 }
 
-Tree::TreeItem* Tree::addChild(const char* data, Rules rules, int value) {
+Tree::TreeItem* Tree::addChild(const char* data, int row, int column, Rules rules, int value) {
 	std::string str = data;
-	return add(str, rules, value, false);
+	return add(str, row, column, rules, value, false);
 }
 
-Tree::TreeItem* Tree::addChild(int data, Rules rules, int value) {
+Tree::TreeItem* Tree::addChild(int data, int row, int column, Rules rules, int value) {
 	std::string str = std::to_string(data);
-	return add(str, rules, value, false);
+	return add(str, row, column, rules, value, false);
 }
 
-Tree::TreeItem* Tree::addNext(std::string data, Rules rules, int value) {
+Tree::TreeItem* Tree::addNext(std::string data, int row, int column, Rules rules, int value) {
 	depth++;
-	return add(data, rules, value, true);
+	return add(data, row, column, rules, value, true);
 }
 
-Tree::TreeItem* Tree::addNext(const char* data, Rules rules, int value) {
+Tree::TreeItem* Tree::addNext(const char* data, int row, int column, Rules rules, int value) {
 	std::string str = data;
-	return add(str, rules, value, true);
+	return add(str, row, column, rules, value, true);
 }
 
-Tree::TreeItem* Tree::addNext(int data, Rules rules, int value) {
+Tree::TreeItem* Tree::addNext(int data, int row, int column, Rules rules, int value) {
 	std::string str = std::to_string(data);
-	return add(str, rules, value, true);
+	return add(str, row, column, rules, value, true);
 }
 
-Tree::TreeItem* Tree::add(std::string& data, Rules rules, int value, bool isModify) {
+Tree::TreeItem* Tree::add(std::string& data, int row, int column, Rules rules, int value, bool isModify) {
 	elements++;
-	TreeItem* item = new TreeItem(data, rules, value);
+	TreeItem* item = new TreeItem(data, row, column, rules, value);
 	if (root == nullptr) {
 		root = item;
 		lastModified = root;

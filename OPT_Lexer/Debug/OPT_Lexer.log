@@ -1,5 +1,3 @@
-﻿  SyntaxAnalyzer.cpp
-C:\Users\yanec\source\repos\Lexer_OPT\OPT_Lexer\SyntaxAnalyzer.cpp(17,26): warning C4018: <=: несоответствие типов со знаком и без знака
-  Tree.cpp
-  Создание кода...
-  OPT_Lexer.vcxproj -> C:\Users\yanec\source\repos\Lexer_OPT\Debug\OPT_Lexer.exe
+﻿  OPT_Lexer.cpp
+E:\GitHub\Lexer_OPT\OPT_Lexer\OPT_Lexer.cpp(68,28): warning C4018: >=: несоответствие типов со знаком и без знака
+  OPT_Lexer.vcxproj -> E:\GitHub\Lexer_OPT\Debug\OPT_Lexer.exe

@@ -1,27 +1,27 @@
 DATA SEGMENT
 	A dw ?
-	B dd ?
+	B dw ?
 	C dw 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 DATA ENDS
 CODE SEGMENT
 ASSUME CS:CODE, DS:DATA
 PR PROC
-		; C := A
+		; C[10] := A
+	MOV BX, 10
 	MOV BP, A
-	MOV C, BP
+	MOV C[BX], BP
+		; A := C[10]
+	MOV BP, 10
+	MOV BP, C[BP]
+	MOV A, BP
 		; LOOP
 ?L0: nop
-		; C := A
+		; C[A] := A
+	MOV BX, A
 	MOV BP, A
-	MOV C, BP
+	MOV C[BX], BP
 		; LOOP
 ?L1: nop
-		; C := A
-	MOV BP, A
-	MOV C, BP
-		; A := C
-	MOV BP, C
-	MOV A, BP
 		; A := C[A]
 	MOV BP, A
 	MOV BP, C[BP]
@@ -42,8 +42,8 @@ PR PROC
 		; ENDLOOP
 	JMP ?L0
 	nop
-		; A := C[1]
-	MOV BP, 1
+		; A := C[11]
+	MOV BP, 11
 	MOV BP, C[BP]
 	MOV A, BP
 	nop
