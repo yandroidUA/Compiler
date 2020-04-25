@@ -14,10 +14,12 @@ public:
 	struct TreeItem {
 	public:
 
-		TreeItem(std::string& data, Rules rule, int value) {
+		TreeItem(std::string& data, int row, int column, Rules rule, int value) {
 			this->data = data;
 			this->value = value;
 			this->rule = rule;
+			this->row = row;
+			this->column = column;
 		}
 
 		~TreeItem() = default;
@@ -38,6 +40,14 @@ public:
 			return value;
 		}
 
+		inline int getRow() const {
+			return row;
+		}
+
+		inline int getColumn() const {
+			return column;
+		}
+
 		TreeItem* add(TreeItem* item) {
 			childs.push_back(item);
 			return item;
@@ -52,8 +62,12 @@ public:
 				tab--;
 			}
 
-			std::cout << data << std::endl;
-			
+			std::cout << data;
+			if (value != -1) {
+			std::cout << " " << value;
+			}
+			std::cout << std::endl;
+
 			for (auto& child : childs) {
 				child->print(tabulation + 2);
 			}
@@ -69,7 +83,11 @@ public:
 				tab--;
 			}
 
-			fileStream << data << std::endl;
+			fileStream << data;
+			if (value != -1) {
+				fileStream << " " << value;
+			}
+			fileStream << std::endl;
 
 			for (auto& child : childs) {
 				child->dumpIntoFile(fileStream, tabulation + 2);
@@ -85,23 +103,27 @@ public:
 		Rules rule;
 		// contains id of main resource (such as id of variable or identifier)
 		int value;
+		// row position
+		int row;
+		// column position
+		int column;
 	};
 
 	/*	add child to lastModified
 		DON'T modify the lastModified
 		return pointer to added item
 	*/
-	TreeItem* addChild(std::string, Rules, int);
-	TreeItem* addChild(const char*, Rules, int);
-	TreeItem* addChild(int, Rules, int);
+	TreeItem* addChild(std::string, int, int, Rules, int);
+	TreeItem* addChild(const char*, int, int, Rules, int);
+	TreeItem* addChild(int, int, int, Rules, int);
 
 	/*	add next to lastModified 
 		lastModified become added TreeItem 
 		return pointer to added item
 	*/
-	TreeItem* addNext(std::string, Rules, int);
-	TreeItem* addNext(const char*, Rules, int);
-	TreeItem* addNext(int, Rules, int);
+	TreeItem* addNext(std::string, int, int, Rules, int);
+	TreeItem* addNext(const char*, int, int, Rules, int);
+	TreeItem* addNext(int, int, int, Rules, int);
 
 	TreeItem* getCurrent();
 
@@ -121,6 +143,6 @@ private:
 	int depth;
 	int elements;
 
-	TreeItem* add(std::string&, Rules, int, bool);
+	TreeItem* add(std::string&, int, int, Rules, int, bool);
 };
 

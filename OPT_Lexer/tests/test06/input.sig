@@ -3,12 +3,10 @@ PROGRAM PR;
    B:FLOAT;
    C: [0 .. 10];
 BEGIN
-	C:=A;
+	C[10] := 0;
+	(* this is correct test to show that comment cannot fail program *)
 	LOOP 
-		C:=A;
-		LOOP
-			C:=A;
-			A:=C;
-			A:=C[A];
-			A:=C[1];
+		(* yes, it's works *)
+		A := C[0];
+	ENDLOOP;
 END.

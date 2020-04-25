@@ -1,8 +1,4 @@
 PROGRAM PR;
    VAR A:INTEGER;
-   C:[0 .. 10][5 .. 10];
-   D:[4..7];
-   B : INTEGER;
-BEGIN
-	C[D[C[D[A]]]] := C[D[B]];
+   (* here programm must fail, because <declaration-list> must end with BEGIN or have anotger declaration that starts with <identifier>*)
 END.

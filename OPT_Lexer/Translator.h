@@ -28,6 +28,8 @@ private:
 
 	bool isIdentifierIsInteger(int);
 
+	Identifier* getIdentifier(int);
+
 	void addIdentifier(Identifier);
 
 	void analyze(Tree::TreeItem*, std::string&);

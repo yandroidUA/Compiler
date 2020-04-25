@@ -14,6 +14,9 @@ private:
 	int currentIndex = 0;
 	std::vector<LexerResult> lexerResults;
 	Tree tree;
+	// for error handling
+	bool errorSyntaxHappened = false;
+	std::string errorMessageSyntax;
 
 	/*	reads from lexerResults symbol with index @param 
 		if IndexOutOfBoundsException -> print exception "Unexpected end of file"

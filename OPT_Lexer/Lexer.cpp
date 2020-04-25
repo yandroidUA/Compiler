@@ -18,16 +18,6 @@ int reservedWordsIndex = 401;
 int constantsIndex = 501;
 int variablesIndex = 1001;
 
-int currentTokenState[6] = {0, 0, 0, 0, 0, 0};
-std::string token = "";
-
-int currentColumn = 0;
-int currentRow = 1;
-int savedColumn = currentColumn;
-int savedRow = currentRow;
-bool errorHappened = false;
-std::string errorToken = "";
-
 bool Lexer::isLetter(int character) {
 	for (auto& c : lettersVector) {
 		if (c == character) {

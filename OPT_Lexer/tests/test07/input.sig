@@ -3,17 +3,10 @@ PROGRAM PR;
    B:FLOAT;
    C: [0 .. 10];
 BEGIN
-	VAR C:FLOAT;
-	C:=A;
+	C[10] := 0;
+	( and this is incorrect comment to show that it can fail the programm *)
 	LOOP 
-		C:=A;
-		LOOP
-			C:=A;
-			A:=C;
-			A:=C[A];
-			A:=C[1];
-		ENDLOOP;
-		A:=C[1];
+		(* yes, it isn't work *)
+		A := C[0];
 	ENDLOOP;
-	A:=C[1];
 END.
