@@ -1,0 +1,3 @@
+PROGRAM PR;
+BEGIN
+END.

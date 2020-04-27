@@ -1,7 +1,7 @@
 ﻿#include <iostream>
 #include "Lexer.h"
 #include "SyntaxAnalyzer.h"
-// #include "Translator.h"
+#include "Translator.h"
 #include <vector>
 #include <string>
 
@@ -56,9 +56,9 @@ void start(std::string& path) {
     syntaxAnalizer.analyze();
     syntaxAnalizer.dumpTreeIntoFile(syntaxOutputFile, lexerAnalyzerResult.getErrorMassage());
     std::cout << std::endl << std::endl;
-   // Translator translator = Translator(syntaxAnalizer.getResultTree());
-   // translator.analyze();
-   // translator.dumpIntoFile(translatorOutputFile);
+   Translator translator = Translator(syntaxAnalizer.getResultTree());
+   translator.analyze();
+   translator.dumpIntoFile(translatorOutputFile);
 }
 
 std::string getOutputPath(std::string& inputPath, std::string output) {

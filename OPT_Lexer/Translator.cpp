@@ -130,8 +130,17 @@ bool Translator::caseVariableDeclarations(Tree::TreeItem* item) {
 
 	std::vector<Tree::TreeItem*> variableDeclarationsChild = item->getChilds();
 
+	if (variableDeclarationsChild.size() == 1) {
+		if (variableDeclarationsChild.at(0)->getRule() != Rules::EMPTY) {
+			std::cout << "ERROR! <empty> expected, but got " << variableDeclarationsChild.at(0)->getRule() << std::endl;
+			return false;
+		}
+		startDataSegment();
+		return true;
+	}
+
 	if (variableDeclarationsChild.size() != 2) {
-		std::cout << "ERROR! <variable-declarations> must have only 2 childs, but got " << variableDeclarationsChild.size() << std::endl;
+		std::cout << "ERROR! <variable-declarations> must have only 2 childs or <empty>, but got " << variableDeclarationsChild.size() << std::endl;
 		return false;
 	}
 

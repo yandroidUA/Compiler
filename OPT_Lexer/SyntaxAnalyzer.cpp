@@ -116,8 +116,13 @@ LexerResult SyntaxAnalyzer::caseVariableDeclarations(int index) {
 	tree.addNext("<variable-declarations> --> VAR <declarations-list>|<empty>", -1, -1, VARIABLE_DECLARATIONS, -1);
 	LexerResult item = getItem(index);
 
+	if (item.getCode() == BEGIN) {
+		tree.addChild("<empty>", -1, -1, EMPTY, -1);
+		return item;
+	}
+
 	if (item.getCode() != VAR) {
-		handleError("VAR expected", getItem(index));
+		handleError("VAR or <empty> expected", getItem(index));
 		return nullableResult;
 	}
 	tree.addChild(item.getToken(), item.getRowNumber(), item.getColumnNumber(), ADDING_RESERVED_WORD, item.getCode());

@@ -1,0 +1,8 @@
+﻿  OPT_Lexer.cpp
+E:\GitHub\Lexer_OPT\OPT_Lexer\OPT_Lexer.cpp(44,74): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+  Создание кода
+  1 of 735 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Создание кода завершено
+  OPT_Lexer.vcxproj -> E:\GitHub\Lexer_OPT\x64\Release\OPT_Lexer.exe
