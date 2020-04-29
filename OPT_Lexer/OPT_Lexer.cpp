@@ -21,8 +21,8 @@ int main(int argc, char** argv) {
 
     std::cout << "PATH: " << argv[1] << std::endl;
     std::string path = argv[1];
-    start(path);
-    //generateTestFiles(14);
+    //start(path);
+    generateTestFiles(15);
 }
 
 void generateTestFiles(int count) {
@@ -44,7 +44,7 @@ std::string getNumberOfTest(int number) {
 
 void start(std::string& path) {
     std::string analyzingFile = path;
-    std::string syntaxOutputFile = getOutputPath(analyzingFile, "output.txt");
+    std::string syntaxOutputFile = getOutputPath(analyzingFile, "expected.txt");
     std::string translatorOutputFile = getOutputPath(analyzingFile, "output.asm");
 
     Lexer lexer;
@@ -56,9 +56,9 @@ void start(std::string& path) {
     syntaxAnalizer.analyze();
     syntaxAnalizer.dumpTreeIntoFile(syntaxOutputFile, lexerAnalyzerResult.getErrorMassage());
     std::cout << std::endl << std::endl;
-   Translator translator = Translator(syntaxAnalizer.getResultTree());
-   translator.analyze();
-   translator.dumpIntoFile(translatorOutputFile);
+    Translator translator = Translator(syntaxAnalizer.getResultTree());
+    translator.analyze();
+    translator.dumpIntoFile(translatorOutputFile);
 }
 
 std::string getOutputPath(std::string& inputPath, std::string output) {

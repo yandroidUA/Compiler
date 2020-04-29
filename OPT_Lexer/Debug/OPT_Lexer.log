@@ -1,3 +1,6 @@
-﻿  SyntaxAnalyzer.cpp
-E:\GitHub\Lexer_OPT\OPT_Lexer\SyntaxAnalyzer.cpp(40,26): warning C4018: <=: несоответствие типов со знаком и без знака
+﻿  OPT_Lexer.cpp
+E:\GitHub\Lexer_OPT\OPT_Lexer\OPT_Lexer.cpp(68,28): warning C4018: >=: несоответствие типов со знаком и без знака
+  SyntaxAnalyzer.cpp
+E:\GitHub\Lexer_OPT\OPT_Lexer\SyntaxAnalyzer.cpp(37,26): warning C4018: <=: несоответствие типов со знаком и без знака
+  Создание кода...
   OPT_Lexer.vcxproj -> E:\GitHub\Lexer_OPT\Debug\OPT_Lexer.exe

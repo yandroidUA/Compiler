@@ -1,0 +1,222 @@
+
+
+(0)<signal-program> --> <program>
+(2)**<program> --> PROGRAM <procedure-identifier>;< block > .
+(4)****<procedure-identifier> --> <identifier>
+(6)******<identifier> --> <letter><string>
+(8)********PR 1001
+(4)****<block> --> <variable-declarations> BEGIN <statements-list> END
+(6)******<variable-declarations> --> VAR <declarations-list>|<empty>
+(8)********VAR 404
+(8)********<declarations-list> --> <declaration><declarations-list>|<empty>
+(10)**********<declaration> --><variable-identifier>:<attribute><attributes-list>;
+(12)************<variable-identifier> --> <identifier>
+(14)**************<identifier> --> <letter><string>
+(16)****************A 1002
+(12)************: 0
+(12)************< attribute > -- > INTEGER | FLOAT | [<range>]
+(14)**************INTEGER 408
+(12)************<attributes-list> --> <attribute> <attributes-list> | <empty>
+(14)**************<empty>
+(10)**********<declarations-list> --> <declaration><declarations-list>|<empty>
+(12)************<declaration> --><variable-identifier>:<attribute><attributes-list>;
+(14)**************<variable-identifier> --> <identifier>
+(16)****************<identifier> --> <letter><string>
+(18)******************B 1003
+(14)**************: 0
+(14)**************< attribute > -- > INTEGER | FLOAT | [<range>]
+(16)****************FLOAT 405
+(14)**************<attributes-list> --> <attribute> <attributes-list> | <empty>
+(16)****************<empty>
+(12)************<declarations-list> --> <declaration><declarations-list>|<empty>
+(14)**************<declaration> --><variable-identifier>:<attribute><attributes-list>;
+(16)****************<variable-identifier> --> <identifier>
+(18)******************<identifier> --> <letter><string>
+(20)********************C 1004
+(16)****************: 0
+(16)****************< attribute > -- > INTEGER | FLOAT | [<range>]
+(18)******************[ 2
+(18)******************<range> --> <unsigned-integer> .. <unsigned-integer>
+(20)********************<unsigned-integer>
+(22)**********************0 501
+(20)********************.. 302
+(20)********************<unsigned-integer>
+(22)**********************10 502
+(18)******************] 3
+(16)****************<attributes-list> --> <attribute> <attributes-list> | <empty>
+(18)******************<empty>
+(14)**************<declarations-list> --> <declaration><declarations-list>|<empty>
+(16)****************<empty>
+(6)******BEGIN 402
+(6)******<statements-list> --> <statement> <statements-list> | <empty>
+(8)********<statement> --> <variable> := <expression> ; | LOOP <statements-list> ENDLOOP;
+(10)**********<variable> --> <variable-identifier><dimension>
+(12)************<variable-identifier> --> <identifier>
+(14)**************<identifier> --> <letter><string>
+(16)****************C 1004
+(12)************<dimension> --> [ <expression> ] | <empty>
+(14)**************[ 2
+(14)**************<expression> --> <variable> | <unsigned-integer>
+(16)****************<unsigned-integer>
+(18)******************10 502
+(14)**************] 3
+(10)**********:= 301
+(10)**********<expression> --> <variable> | <unsigned-integer>
+(12)************<variable> --> <variable-identifier><dimension>
+(14)**************<variable-identifier> --> <identifier>
+(16)****************<identifier> --> <letter><string>
+(18)******************A 1002
+(14)**************<dimension> --> [ <expression> ] | <empty>
+(16)****************<empty>
+(10)**********; 1
+(8)********<statements-list> --> <statement> <statements-list> | <empty>
+(10)**********<statement> --> <variable> := <expression> ; | LOOP <statements-list> ENDLOOP;
+(12)************<variable> --> <variable-identifier><dimension>
+(14)**************<variable-identifier> --> <identifier>
+(16)****************<identifier> --> <letter><string>
+(18)******************A 1002
+(14)**************<dimension> --> [ <expression> ] | <empty>
+(16)****************<empty>
+(12)************:= 301
+(12)************<expression> --> <variable> | <unsigned-integer>
+(14)**************<variable> --> <variable-identifier><dimension>
+(16)****************<variable-identifier> --> <identifier>
+(18)******************<identifier> --> <letter><string>
+(20)********************C 1004
+(16)****************<dimension> --> [ <expression> ] | <empty>
+(18)******************[ 2
+(18)******************<expression> --> <variable> | <unsigned-integer>
+(20)********************<unsigned-integer>
+(22)**********************10 502
+(18)******************] 3
+(12)************; 1
+(10)**********<statements-list> --> <statement> <statements-list> | <empty>
+(12)************<statement> --> <variable> := <expression> ; | LOOP <statements-list> ENDLOOP;
+(14)**************LOOP 406
+(14)**************<statements-list> --> <statement> <statements-list> | <empty>
+(16)****************<statement> --> <variable> := <expression> ; | LOOP <statements-list> ENDLOOP;
+(18)******************<variable> --> <variable-identifier><dimension>
+(20)********************<variable-identifier> --> <identifier>
+(22)**********************<identifier> --> <letter><string>
+(24)************************C 1004
+(20)********************<dimension> --> [ <expression> ] | <empty>
+(22)**********************[ 2
+(22)**********************<expression> --> <variable> | <unsigned-integer>
+(24)************************<variable> --> <variable-identifier><dimension>
+(26)**************************<variable-identifier> --> <identifier>
+(28)****************************<identifier> --> <letter><string>
+(30)******************************A 1002
+(26)**************************<dimension> --> [ <expression> ] | <empty>
+(28)****************************<empty>
+(22)**********************] 3
+(18)******************:= 301
+(18)******************<expression> --> <variable> | <unsigned-integer>
+(20)********************<variable> --> <variable-identifier><dimension>
+(22)**********************<variable-identifier> --> <identifier>
+(24)************************<identifier> --> <letter><string>
+(26)**************************A 1002
+(22)**********************<dimension> --> [ <expression> ] | <empty>
+(24)************************<empty>
+(18)******************; 1
+(16)****************<statements-list> --> <statement> <statements-list> | <empty>
+(18)******************<statement> --> <variable> := <expression> ; | LOOP <statements-list> ENDLOOP;
+(20)********************LOOP 406
+(20)********************<statements-list> --> <statement> <statements-list> | <empty>
+(22)**********************<statement> --> <variable> := <expression> ; | LOOP <statements-list> ENDLOOP;
+(24)************************<variable> --> <variable-identifier><dimension>
+(26)**************************<variable-identifier> --> <identifier>
+(28)****************************<identifier> --> <letter><string>
+(30)******************************A 1002
+(26)**************************<dimension> --> [ <expression> ] | <empty>
+(28)****************************<empty>
+(24)************************:= 301
+(24)************************<expression> --> <variable> | <unsigned-integer>
+(26)**************************<variable> --> <variable-identifier><dimension>
+(28)****************************<variable-identifier> --> <identifier>
+(30)******************************<identifier> --> <letter><string>
+(32)********************************C 1004
+(28)****************************<dimension> --> [ <expression> ] | <empty>
+(30)******************************[ 2
+(30)******************************<expression> --> <variable> | <unsigned-integer>
+(32)********************************<variable> --> <variable-identifier><dimension>
+(34)**********************************<variable-identifier> --> <identifier>
+(36)************************************<identifier> --> <letter><string>
+(38)**************************************A 1002
+(34)**********************************<dimension> --> [ <expression> ] | <empty>
+(36)************************************<empty>
+(30)******************************] 3
+(24)************************; 1
+(22)**********************<statements-list> --> <statement> <statements-list> | <empty>
+(24)************************<statement> --> <variable> := <expression> ; | LOOP <statements-list> ENDLOOP;
+(26)**************************<variable> --> <variable-identifier><dimension>
+(28)****************************<variable-identifier> --> <identifier>
+(30)******************************<identifier> --> <letter><string>
+(32)********************************A 1002
+(28)****************************<dimension> --> [ <expression> ] | <empty>
+(30)******************************<empty>
+(26)**************************:= 301
+(26)**************************<expression> --> <variable> | <unsigned-integer>
+(28)****************************<variable> --> <variable-identifier><dimension>
+(30)******************************<variable-identifier> --> <identifier>
+(32)********************************<identifier> --> <letter><string>
+(34)**********************************C 1004
+(30)******************************<dimension> --> [ <expression> ] | <empty>
+(32)********************************[ 2
+(32)********************************<expression> --> <variable> | <unsigned-integer>
+(34)**********************************<unsigned-integer>
+(36)************************************1 503
+(32)********************************] 3
+(26)**************************; 1
+(24)************************<statements-list> --> <statement> <statements-list> | <empty>
+(26)**************************<empty>
+(20)********************ENDLOOP 407
+(20)********************; 1
+(18)******************<statements-list> --> <statement> <statements-list> | <empty>
+(20)********************<statement> --> <variable> := <expression> ; | LOOP <statements-list> ENDLOOP;
+(22)**********************<variable> --> <variable-identifier><dimension>
+(24)************************<variable-identifier> --> <identifier>
+(26)**************************<identifier> --> <letter><string>
+(28)****************************A 1002
+(24)************************<dimension> --> [ <expression> ] | <empty>
+(26)**************************<empty>
+(22)**********************:= 301
+(22)**********************<expression> --> <variable> | <unsigned-integer>
+(24)************************<variable> --> <variable-identifier><dimension>
+(26)**************************<variable-identifier> --> <identifier>
+(28)****************************<identifier> --> <letter><string>
+(30)******************************C 1004
+(26)**************************<dimension> --> [ <expression> ] | <empty>
+(28)****************************[ 2
+(28)****************************<expression> --> <variable> | <unsigned-integer>
+(30)******************************<unsigned-integer>
+(32)********************************1 503
+(28)****************************] 3
+(22)**********************; 1
+(20)********************<statements-list> --> <statement> <statements-list> | <empty>
+(22)**********************<empty>
+(14)**************ENDLOOP 407
+(14)**************; 1
+(12)************<statements-list> --> <statement> <statements-list> | <empty>
+(14)**************<statement> --> <variable> := <expression> ; | LOOP <statements-list> ENDLOOP;
+(16)****************<variable> --> <variable-identifier><dimension>
+(18)******************<variable-identifier> --> <identifier>
+(20)********************<identifier> --> <letter><string>
+(22)**********************A 1002
+(18)******************<dimension> --> [ <expression> ] | <empty>
+(20)********************<empty>
+(16)****************:= 301
+(16)****************<expression> --> <variable> | <unsigned-integer>
+(18)******************<variable> --> <variable-identifier><dimension>
+(20)********************<variable-identifier> --> <identifier>
+(22)**********************<identifier> --> <letter><string>
+(24)************************C 1004
+(20)********************<dimension> --> [ <expression> ] | <empty>
+(22)**********************[ 2
+(22)**********************<expression> --> <variable> | <unsigned-integer>
+(24)************************<unsigned-integer>
+(26)**************************11 504
+(22)**********************] 3
+(16)****************; 1
+(14)**************<statements-list> --> <statement> <statements-list> | <empty>
+(16)****************<empty>
+(6)******END 403
