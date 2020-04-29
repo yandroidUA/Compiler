@@ -4,6 +4,7 @@
 #include <string>
 #include <fstream>
 #include "Rules.h"
+#include "LexerResult.h"
 
 class Tree {
 public:
@@ -114,34 +115,35 @@ public:
 		return pointer to added item
 	*/
 	TreeItem* addChild(std::string, int, int, Rules, int);
-	TreeItem* addChild(const char*, int, int, Rules, int);
-	TreeItem* addChild(int, int, int, Rules, int);
+	TreeItem* addChild(LexerResult*, Rules);
 
 	/*	add next to lastModified 
 		lastModified become added TreeItem 
 		return pointer to added item
 	*/
 	TreeItem* addNext(std::string, int, int, Rules, int);
-	TreeItem* addNext(const char*, int, int, Rules, int);
-	TreeItem* addNext(int, int, int, Rules, int);
+	TreeItem* addNext(LexerResult*, Rules);
 
 	TreeItem* getCurrent();
 
-	/*	lastModifiend = param
+	/*	
+		lastModifiend = param
 		TRUE  -> if switch is successfull
 		FALSE -> if not
 	*/
 	bool switchTo(TreeItem*);
 
+	// print full tree with item tabulation
 	void print();
+	// dumpt full tree into file
 	void dumpIntoFile(std::ofstream&);
+
+	// returning root of tree
 	TreeItem* getRoot();
 
 private:
 	TreeItem* root;
 	TreeItem* lastModified;
-	int depth;
-	int elements;
 
 	TreeItem* add(std::string&, int, int, Rules, int, bool);
 };

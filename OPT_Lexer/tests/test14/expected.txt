@@ -1,12 +1,12 @@
 
 
-<identifier> expected, row = 4 column = 4 but got VAR
+';' expected, row = 2 column = 18 but got FLOAT64
 
 (0)<signal-program> --> <program>
 (2)**<program> --> PROGRAM <procedure-identifier>;< block > .
 (4)****<procedure-identifier> --> <identifier>
 (6)******<identifier> --> <letter><string>
-(8)********PR 1026
+(8)********PR 1042
 (4)****<block> --> <variable-declarations> BEGIN <statements-list> END
 (6)******<variable-declarations> --> VAR <declarations-list>|<empty>
 (8)********VAR 404
@@ -14,14 +14,8 @@
 (10)**********<declaration> --><variable-identifier>:<attribute><attributes-list>;
 (12)************<variable-identifier> --> <identifier>
 (14)**************<identifier> --> <letter><string>
-(16)****************A 1027
+(16)****************A 1043
 (12)************: 0
 (12)************< attribute > -- > INTEGER | FLOAT | [<range>]
 (14)**************INTEGER 408
 (12)************<attributes-list> --> <attribute> <attributes-list> | <empty>
-(14)**************<empty>
-(10)**********<declarations-list> --> <declaration><declarations-list>|<empty>
-(12)************<declaration> --><variable-identifier>:<attribute><attributes-list>;
-(14)**************<variable-identifier> --> <identifier>
-(16)****************<identifier> --> <letter><string>
-(18)******************VAR 404
