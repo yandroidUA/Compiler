@@ -24,7 +24,8 @@ enum Rules{
 	ADDING_RESERVED_WORD = 22,
 	ADDING_INDENTIFIER = 23,
 	ADDING_SEPARATED = 24,
-	ADDING_CONSTANT = 25 
+	ADDING_CONSTANT = 25,
+	ELSE_RULE = 26
 };
 
 /*									RULES
@@ -52,4 +53,13 @@ enum Rules{
 20. <digits-string> --> <digit><digits-string> | <empty>
 21. <digit> --> 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 22. <letter> --> A | B | C | D | ... | Z
+*/
+
+
+/*
+
+<statement> --> <variable> := <expression> ; 
+| LOOP <statements-list> ENDLOOP ; 
+| IF <expression> THEN <statements-list> <else> ENDIF;
+<else> --> ELSE <statements-list> | <empty>
 */

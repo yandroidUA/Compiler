@@ -21,12 +21,12 @@ int main(int argc, char** argv) {
 
     std::cout << "PATH: " << argv[1] << std::endl;
     std::string path = argv[1];
-    //start(path);
-    generateTestFiles(15);
+    start(path);
+    //generateTestFiles(15);
 }
 
 void generateTestFiles(int count) {
-    std::string root_path = "E:\\GitHub\\Lexer_OPT\\OPT_Lexer\\tests";
+    std::string root_path = "C:\\Users\\yanec\\Documents\\GitHub\\Lexer_OPT\\OPT_Lexer\\tests";
 
     for (int i = 1; i <= count; i++) {
         std::string m_path = root_path + "\\test" + getNumberOfTest(i) + "\\input.sig";
@@ -56,9 +56,9 @@ void start(std::string& path) {
     syntaxAnalizer.analyze();
     syntaxAnalizer.dumpTreeIntoFile(syntaxOutputFile, lexerAnalyzerResult.getErrorMassage());
     std::cout << std::endl << std::endl;
-    Translator translator = Translator(syntaxAnalizer.getResultTree());
-    translator.analyze();
-    translator.dumpIntoFile(translatorOutputFile);
+    //Translator translator = Translator(syntaxAnalizer.getResultTree());
+    //translator.analyze();
+    //translator.dumpIntoFile(translatorOutputFile);
 }
 
 std::string getOutputPath(std::string& inputPath, std::string output) {

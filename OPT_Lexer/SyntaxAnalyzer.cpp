@@ -350,6 +350,36 @@ std::pair<LexerResult*, bool> SyntaxAnalyzer::caseStatement(int index) {
 		 tree.addChild(item, ADDING_RESERVED_WORD);
 		 item = getItem(item->getIndexInResultVector() + 1);
 
+	 } else if (item->getCode() == ReserverWords::IF){
+		 tree.addNext("IF <expression> THEN <statements-list> <else> ENDIF;", -1, -1, STATEMENT, -1);
+		 current = tree.getCurrent();
+		 tree.addChild(item, Rules::ADDING_RESERVED_WORD);
+		 tree.switchTo(current);
+
+		 item = caseExpression(item->getIndexInResultVector() + 1);
+		 if (item == nullptr) return std::make_pair(item, false);
+		 tree.switchTo(current);
+
+		 if (item->getCode() != THEN) {
+			 handleError("THEN expected", item);
+			 return std::make_pair(item, false);
+		 }
+		 tree.addChild(item, Rules::ADDING_RESERVED_WORD);
+
+		 item = caseStatementList(item->getIndexInResultVector() + 1);
+		 if (item == nullptr) return std::make_pair(item, false);
+
+		 item = caseElse(item->getIndexInResultVector());
+		 if (item == nullptr) return std::make_pair(item, false);
+		 tree.switchTo(current);
+
+		 if (item->getCode() != ENDIF) {
+			 handleError("ENDIF expected", item);
+			 return std::make_pair(item, false);
+		 }
+		 tree.addChild(item, Rules::ADDING_RESERVED_WORD);
+		 item = getItem(item->getIndexInResultVector() + 1);
+
 	 } else {
 		 // handleError("<variable> or LOOP expected", item);
 		 return std::make_pair(item, true);
@@ -366,6 +396,23 @@ std::pair<LexerResult*, bool> SyntaxAnalyzer::caseStatement(int index) {
 	 handleError("; expected", item);
 	 return std::make_pair(nullptr, false);
  }
+
+LexerResult* SyntaxAnalyzer::caseElse(int index) {
+	Tree::TreeItem* it = tree.getCurrent();
+	tree.addNext("<else> --> ELSE <statements-list> | <empty>", -1, -1, ELSE_RULE, -1);
+	LexerResult* item = getItem(index);
+
+	if (item->getCode() != ReserverWords::ELSE) {
+		tree.addChild("<empty>", -1, -1, EMPTY, -1);
+		return item;
+	}
+
+	item = caseStatementList(item->getIndexInResultVector() + 1);
+	if (item == nullptr) return item;
+
+	tree.switchTo(it);
+	return item;
+}
 
 // 12. <expression> --> <variable> | <unsigned-integer>
 LexerResult* SyntaxAnalyzer::caseExpression(int index) {

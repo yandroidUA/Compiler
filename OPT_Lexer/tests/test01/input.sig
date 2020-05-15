@@ -3,15 +3,7 @@ PROGRAM PR;
    B:FLOAT;
    C: [0 .. 10];
 BEGIN
-	C[10]:=A;
-	A := C[10];
-	LOOP 
-		C[A]:=A;
-		LOOP
-			A:=C[A];
-			A:=C[1];
-		ENDLOOP;
-		A:=C[1];
-	ENDLOOP;
-	A:=C[11];
+	IF 1 THEN A := 1; ELSE A := 2; ENDIF;
+	IF C[A] THEN ENDIF;
+	IF A THEN IF 1 THEN A := 10; ELSE A := 2; ENDIF; ELSE A := 1; ENDIF;
 END.

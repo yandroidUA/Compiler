@@ -90,6 +90,11 @@ Lexer::Lexer() {
 	addReservedWord("LOOP", LOOP);						//406
 	addReservedWord("ENDLOOP", ENDLOOP);				//407
 	addReservedWord("INTEGER", INTEGER);				//408
+	addReservedWord("ELSE", ELSE);				//408
+	addReservedWord("IF", IF);				//408
+	addReservedWord("THEN", THEN);				//408
+	addReservedWord("ENDIF", ENDIF);				//408
+
 
 	addOneSeparatedToken(":", COLON);					//0
 	addOneSeparatedToken(";", SEMI_COLON);				//1

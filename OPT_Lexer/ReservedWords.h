@@ -14,5 +14,9 @@ enum ReserverWords {
 	FLOAT = 405,
 	LOOP = 406,
 	ENDLOOP = 407,
-	INTEGER = 408
+	INTEGER = 408,
+	IF = 409,
+	ELSE = 410,
+	ENDIF = 411,
+	THEN = 412
 };

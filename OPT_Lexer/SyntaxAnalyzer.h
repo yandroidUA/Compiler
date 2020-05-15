@@ -58,6 +58,10 @@ private:
 
 	// analyze 4. <variable-declarations> --> VAR <declarations-list>|<empty>, starting with index, that passed as parametr
 	LexerResult* caseVariableDeclarations(int);
+
+	// <else> --> ELSE <statements-list> | <empty>
+	LexerResult* caseElse(int);
+
 	/* 
 		analyze 8. <attribute> --> INTEGER | FLOAT | [<range>], starting with index, that passed as parametr
 		returns pair of next item or item that don't suits case, 
