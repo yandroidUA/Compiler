@@ -1,8 +1,0 @@
-#pragma once
-enum TokenStatus {
-	IDENTIFIER,
-	RESERVED_WORD,
-	ONE_SEPARATED_TOKEN,
-	MULTI_SEPARATED_TOKEN,
-	CONSTANT
-};
