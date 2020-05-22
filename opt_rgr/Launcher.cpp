@@ -1,7 +1,7 @@
 ﻿#include <iostream>
 #include "Lexer.h"
 #include "SyntaxAnalyzer.h"
-#include "Translator.h"
+// #include "Translator.h"
 #include <vector>
 #include <string>
 
@@ -14,7 +14,6 @@ void generateTestFiles(int count);
 std::string getNumberOfTest(int number);
 
 int main(int argc, char** argv) {
-  std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
     if (argc < 2 || argv[1] == nullptr) {
         std::cout << "Wrong path!" << std::endl;
         exit(0);
@@ -23,7 +22,7 @@ int main(int argc, char** argv) {
     std::cout << "PATH: " << argv[1] << std::endl;
     std::string path = argv[1];
     start(path);
-    //generateTestFiles(15);
+    //generateTestFiles(14);
 }
 
 void generateTestFiles(int count) {
@@ -45,11 +44,8 @@ std::string getNumberOfTest(int number) {
 
 void start(std::string& path) {
     std::string analyzingFile = path;
-    std::string syntaxOutputFile = getOutputPath(analyzingFile, "expected.txt");
+    std::string syntaxOutputFile = getOutputPath(analyzingFile, "output.txt");
     std::string translatorOutputFile = getOutputPath(analyzingFile, "output.asm");
-
-    std::cout << "syntaxOutputFile " << syntaxOutputFile << std::endl;
-    std::cout << "translatorOutputFile " << translatorOutputFile << std::endl;
 
     Lexer lexer;
     Lexer::AnalyzeResult lexerAnalyzerResult = lexer.scanFile(analyzingFile);
@@ -60,9 +56,9 @@ void start(std::string& path) {
     syntaxAnalizer.analyze();
     syntaxAnalizer.dumpTreeIntoFile(syntaxOutputFile, lexerAnalyzerResult.getErrorMassage());
     std::cout << std::endl << std::endl;
-    Translator translator = Translator(syntaxAnalizer.getResultTree());
-    translator.analyze();
-    translator.dumpIntoFile(translatorOutputFile);
+   // Translator translator = Translator(syntaxAnalizer.getResultTree());
+   // translator.analyze();
+   // translator.dumpIntoFile(translatorOutputFile);
 }
 
 std::string getOutputPath(std::string& inputPath, std::string output) {

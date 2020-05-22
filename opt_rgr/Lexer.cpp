@@ -96,44 +96,44 @@ Lexer::Lexer() {
 	addOneSeparatedToken("[", LEFT_SQUARE_BRACKET);		//2
 	addOneSeparatedToken("]", RIGHT_SQUARE_BRACKET);	//3
 	addOneSeparatedToken(".", DOT);	//4
-
+	
 	addMultiSeparatedToken(":=", EQUALS);				//301
 	addMultiSeparatedToken("..", DOUBLE_DOT);			//302
 }
 
 void Lexer::addToken(std::string&) {
 	if (currentTokenState[TOKEN_STATUS_CONSTANT] == 1) {
-		//std::cout << token << " is constant, row=" << savedRow << " column=" << savedColumn << std::endl;
+		// std::cout << token << " is constant, row=" << savedRow << " column=" << savedColumn << std::endl;
 		addTokenToResultVector(token, CONSTANT, savedColumn, savedRow);
 		return;
 	}
 
 	if (currentTokenState[TOKEN_STATUS_IDENTIFIER] == 1 && currentTokenState[TOKEN_STATUS_RESERVED_WORD] == 0) {
-		//std::cout << token << " is identifier, row=" << savedRow << " column=" << savedColumn << std::endl;
+		// std::cout << token << " is identifier, row=" << savedRow << " column=" << savedColumn << std::endl;
 		addTokenToResultVector(token, IDENTIFIER, savedColumn, savedRow);
 		return;
 	}
 
 	if (currentTokenState[TOKEN_STATUS_RESERVED_WORD] == 1 && currentTokenState[TOKEN_STATUS_IDENTIFIER] == 0) {
-		//std::cout << token << " is reserved word, row=" << savedRow << " column=" << savedColumn << std::endl;
+		// std::cout << token << " is reserved word, row=" << savedRow << " column=" << savedColumn << std::endl;
 		addTokenToResultVector(token, RESERVED_WORD, savedColumn, savedRow);
 		return;
 	}
 
 	if (currentTokenState[TOKEN_STATUS_ONE_SEPARATED_TOKEN] == 1) {
-		//std::cout << token << " is one separated word, row=" << savedRow << " column=" << savedColumn << std::endl;
+		// std::cout << token << " is one separated word, row=" << savedRow << " column=" << savedColumn << std::endl;
 		addTokenToResultVector(token, ONE_SEPARATED_TOKEN, savedColumn, savedRow);
 		return;
 	}
 
 	if (currentTokenState[TOKEN_STATUS_MULTI_SEPARATED_TOKEN] == 1) {
-		//std::cout << token << " is multi separated word, row=" << savedRow << " column=" << savedColumn << std::endl;
+		// std::cout << token << " is multi separated word, row=" << savedRow << " column=" << savedColumn << std::endl;
 		addTokenToResultVector(token, MULTI_SEPARATED_TOKEN, savedColumn, savedRow);
 		return;
 	}
 
 	if (currentTokenState[TOKEN_STATUS_COMMENT] == 1) {
-		//std::cout << token << " is comment, row=" << savedRow << " column=" << savedColumn << std::endl;
+		// std::cout << token << " is comment, row=" << savedRow << " column=" << savedColumn << std::endl;
 		return;
 	}
 
@@ -265,7 +265,7 @@ int Lexer::readCharacterFromFile(std::ifstream &file) {
 
 int Lexer::caseMultiSeparated(int letter, std::ifstream& file) {
 	token += (char)letter;
-
+	
 	while (!file.eof()) {
 		int nextLetter = readCharacterFromFile(file);
 		if (isSecondPartOfMultiSeparated(letter, nextLetter)) {
@@ -281,8 +281,6 @@ int Lexer::caseMultiSeparated(int letter, std::ifstream& file) {
 			return nextLetter;
 		}
 	}
-
-	return -1;
 }
 
 int Lexer::caseOneSeparated(int letter, std::ifstream& file) {
@@ -299,8 +297,6 @@ int Lexer::caseOneSeparated(int letter, std::ifstream& file) {
 			return readCharacterFromFile(file);
 		}
 	}
-
-	return -1;
 }
 
 int Lexer::caseLetter(int letter, std::ifstream& file) {
@@ -353,8 +349,6 @@ int Lexer::caseNumber(int letter, std::ifstream& file) {
 
 		token += (char)nextLetter;
 	}
-
-	return -1;
 }
 
 int Lexer::caseComment(int letter, std::ifstream& file) {
@@ -403,8 +397,6 @@ int Lexer::caseComment(int letter, std::ifstream& file) {
 
 	}
 
-	return -1;
-
 }
 
 void Lexer::handleError(const char* text, char letter, int row, int column) {
@@ -428,6 +420,7 @@ bool Lexer::isComment(int letter) {
 
 Lexer::AnalyzeResult Lexer::scanFile(std::string& filePath) {
 	std::ifstream file;
+
 	file.open(filePath, std::ios::in);
 
 	int savedLetter = -1;
@@ -466,7 +459,7 @@ Lexer::AnalyzeResult Lexer::scanFile(std::string& filePath) {
 			letter = caseComment(letter, file);
 			if (errorHappened) return AnalyzeResult(errorHappened, errorToken);
 		}
-
+	
 		if (isWhiteSpace(letter)) {
 			savedColumn = currentColumn;
 			savedRow = currentRow;
@@ -482,7 +475,7 @@ Lexer::AnalyzeResult Lexer::scanFile(std::string& filePath) {
 			}
 			continue;
 		}
-
+		
 		// to prevent endless loop when met undefined letter
 		if (letter == savedLetter) {
 			handleError("Undefined symbol", letter, currentRow, currentColumn);
