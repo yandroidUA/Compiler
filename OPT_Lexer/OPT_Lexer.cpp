@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
     std::cout << "PATH: " << argv[1] << std::endl;
     std::string path = argv[1];
     //start(path);
-    generateTestFiles(15);
+    generateTestFiles(9);
 }
 
 void generateTestFiles(int count) {

@@ -9,7 +9,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommandArguments>E:\GitHub\Lexer_OPT\OPT_Lexer\tests\test02\input.sig</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>E:\GitHub\Lexer_OPT\OPT_Lexer\tests\test11\input.sig</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

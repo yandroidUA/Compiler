@@ -1,4 +1,6 @@
 PROGRAM PR;
-   VAR A:INTEGER;
-   (* here programm must fail, because <declaration-list> must end with BEGIN or have anotger declaration that starts with <identifier>*)
+	VAR A : FLOAT;
+	B : [1 .. 2];
+BEGIN
+	B[0] := A;
 END.

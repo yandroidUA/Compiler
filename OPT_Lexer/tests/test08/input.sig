@@ -1,7 +1,6 @@
 PROGRAM PR;
-   VAR A:INTEGER;
-   (* here program must fail, because only one VAR declaration is expected *)
-   VAR B:FLOAT;
-   C: [0 .. 10];
+	VAR A: FLOAT;
+	C: [0 .. 5];
 BEGIN
+	A := C[0];
 END.

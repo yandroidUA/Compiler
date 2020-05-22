@@ -4,7 +4,7 @@
 (2)**<program> --> PROGRAM <procedure-identifier>;< block > .
 (4)****<procedure-identifier> --> <identifier>
 (6)******<identifier> --> <letter><string>
-(8)********PR 1012
+(8)********PR 1013
 (4)****<block> --> <variable-declarations> BEGIN <statements-list> END
 (6)******<variable-declarations> --> VAR <declarations-list>|<empty>
 (8)********VAR 404
@@ -12,7 +12,7 @@
 (10)**********<declaration> --><variable-identifier>:<attribute><attributes-list>;
 (12)************<variable-identifier> --> <identifier>
 (14)**************<identifier> --> <letter><string>
-(16)****************A 1013
+(16)****************A 1014
 (12)************: 0
 (12)************< attribute > -- > INTEGER | FLOAT | [<range>]
 (14)**************FLOAT 405
@@ -22,7 +22,7 @@
 (12)************<declaration> --><variable-identifier>:<attribute><attributes-list>;
 (14)**************<variable-identifier> --> <identifier>
 (16)****************<identifier> --> <letter><string>
-(18)******************B 1014
+(18)******************B 1015
 (14)**************: 0
 (14)**************< attribute > -- > INTEGER | FLOAT | [<range>]
 (16)****************FLOAT 405
@@ -32,7 +32,7 @@
 (14)**************<declaration> --><variable-identifier>:<attribute><attributes-list>;
 (16)****************<variable-identifier> --> <identifier>
 (18)******************<identifier> --> <letter><string>
-(20)********************C 1015
+(20)********************C 1016
 (16)****************: 0
 (16)****************< attribute > -- > INTEGER | FLOAT | [<range>]
 (18)******************[ 2
@@ -49,7 +49,7 @@
 (16)****************<declaration> --><variable-identifier>:<attribute><attributes-list>;
 (18)******************<variable-identifier> --> <identifier>
 (20)********************<identifier> --> <letter><string>
-(22)**********************D 1016
+(22)**********************D 1017
 (18)******************: 0
 (18)******************< attribute > -- > INTEGER | FLOAT | [<range>]
 (20)********************INTEGER 408
@@ -76,28 +76,28 @@
 (14)**************<variable> --> <variable-identifier><dimension>
 (16)****************<variable-identifier> --> <identifier>
 (18)******************<identifier> --> <letter><string>
-(20)********************C 1015
+(20)********************C 1016
 (16)****************<dimension> --> [ <expression> ] | <empty>
 (18)******************[ 2
 (18)******************<expression> --> <variable> | <unsigned-integer>
 (20)********************<variable> --> <variable-identifier><dimension>
 (22)**********************<variable-identifier> --> <identifier>
 (24)************************<identifier> --> <letter><string>
-(26)**************************D 1016
+(26)**************************D 1017
 (22)**********************<dimension> --> [ <expression> ] | <empty>
 (24)************************[ 2
 (24)************************<expression> --> <variable> | <unsigned-integer>
 (26)**************************<variable> --> <variable-identifier><dimension>
 (28)****************************<variable-identifier> --> <identifier>
 (30)******************************<identifier> --> <letter><string>
-(32)********************************C 1015
+(32)********************************C 1016
 (28)****************************<dimension> --> [ <expression> ] | <empty>
 (30)******************************[ 2
 (30)******************************<expression> --> <variable> | <unsigned-integer>
 (32)********************************<variable> --> <variable-identifier><dimension>
 (34)**********************************<variable-identifier> --> <identifier>
 (36)************************************<identifier> --> <letter><string>
-(38)**************************************D 1016
+(38)**************************************D 1017
 (34)**********************************<dimension> --> [ <expression> ] | <empty>
 (36)************************************[ 2
 (36)************************************<expression> --> <variable> | <unsigned-integer>
@@ -112,42 +112,42 @@
 (16)****************<variable> --> <variable-identifier><dimension>
 (18)******************<variable-identifier> --> <identifier>
 (20)********************<identifier> --> <letter><string>
-(22)**********************D 1016
+(22)**********************D 1017
 (18)******************<dimension> --> [ <expression> ] | <empty>
 (20)********************[ 2
 (20)********************<expression> --> <variable> | <unsigned-integer>
 (22)**********************<variable> --> <variable-identifier><dimension>
 (24)************************<variable-identifier> --> <identifier>
 (26)**************************<identifier> --> <letter><string>
-(28)****************************C 1015
+(28)****************************C 1016
 (24)************************<dimension> --> [ <expression> ] | <empty>
 (26)**************************[ 2
 (26)**************************<expression> --> <variable> | <unsigned-integer>
 (28)****************************<variable> --> <variable-identifier><dimension>
 (30)******************************<variable-identifier> --> <identifier>
 (32)********************************<identifier> --> <letter><string>
-(34)**********************************D 1016
+(34)**********************************D 1017
 (30)******************************<dimension> --> [ <expression> ] | <empty>
 (32)********************************[ 2
 (32)********************************<expression> --> <variable> | <unsigned-integer>
 (34)**********************************<variable> --> <variable-identifier><dimension>
 (36)************************************<variable-identifier> --> <identifier>
 (38)**************************************<identifier> --> <letter><string>
-(40)****************************************C 1015
+(40)****************************************C 1016
 (36)************************************<dimension> --> [ <expression> ] | <empty>
 (38)**************************************[ 2
 (38)**************************************<expression> --> <variable> | <unsigned-integer>
 (40)****************************************<variable> --> <variable-identifier><dimension>
 (42)******************************************<variable-identifier> --> <identifier>
 (44)********************************************<identifier> --> <letter><string>
-(46)**********************************************C 1015
+(46)**********************************************C 1016
 (42)******************************************<dimension> --> [ <expression> ] | <empty>
 (44)********************************************[ 2
 (44)********************************************<expression> --> <variable> | <unsigned-integer>
 (46)**********************************************<variable> --> <variable-identifier><dimension>
 (48)************************************************<variable-identifier> --> <identifier>
 (50)**************************************************<identifier> --> <letter><string>
-(52)****************************************************D 1016
+(52)****************************************************D 1017
 (48)************************************************<dimension> --> [ <expression> ] | <empty>
 (50)**************************************************[ 2
 (50)**************************************************<expression> --> <variable> | <unsigned-integer>

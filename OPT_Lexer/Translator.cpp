@@ -7,6 +7,9 @@ std::string codeSegmentString = "";
 
 Translator::Translator(Tree* tree) {
 	this->tree = tree;
+	this->errorHappened = false;
+	this->errorString = "";
+	this->assemblerProgram = "";
 }
 
 void Translator::analyze() {
@@ -55,6 +58,25 @@ void Translator::addIdentifier(Identifier identifier) {
 	declaratedIdentifiers.push_back(identifier);
 }
 
+void Translator::handleError(std::string reason) {
+	std::cout << reason << std::endl;
+	errorString += reason + "\n";
+	errorHappened = true;
+}
+
+void Translator::handleError(std::string reason, Tree::TreeItem* item){
+	std::cout << reason << std::endl;
+	errorString += reason + ", but got " + item->getStringData();
+	if (item->getRow() != -1) {
+		errorString += " (row: " + std::to_string(item->getRow());
+	}
+	if (item->getColumn() != -1) {
+		errorString += ", column: " + std::to_string(item->getColumn()) + ")";
+	}
+	errorString += "\n";
+	errorHappened = true;
+}
+
 void Translator::analyze(Tree::TreeItem* item, std::string& stringToWrite) {
 	if (item == nullptr) return;
 	switch (item->getRule()) {
@@ -69,62 +91,59 @@ void Translator::analyze(Tree::TreeItem* item, std::string& stringToWrite) {
 	}
 }
 
-void Translator::caseProgram(Tree::TreeItem* item) {
+bool Translator::caseProgram(Tree::TreeItem* item) {
 	std::vector<Tree::TreeItem*> programChilds = item->getChilds();
 	if (programChilds.size() != 2) {
-		std::cout << "Error! Program must have <procedure-identifier> AND <block>";
-		return;
+		handleError("Error! Program must have <procedure-identifier> AND <block>");
+		return false;
 	}
 
-	caseProcedureIdentifier(programChilds.at(0));
-	caseBlock(programChilds.at(1));
-	std::cout << "END" << std::endl;
+	return caseProcedureIdentifier(programChilds.at(0)) == false ? false : caseBlock(programChilds.at(1));
 }
 
-void Translator::caseProcedureIdentifier(Tree::TreeItem* item) {
+bool Translator::caseProcedureIdentifier(Tree::TreeItem* item) {
 	std::vector<Tree::TreeItem*> procedureIdentifierChilds = item->getChilds();
 	if (procedureIdentifierChilds.size() != 1 || procedureIdentifierChilds.at(0)->getRule() != IDENTIFIER_RULE) {
-		std::cout << "Error! <procedure-identifier> must contains IDENTIFIER" << std::endl;
-		return;
+		handleError("Error! <procedure-identifier> must contains IDENTIFIER");
+		return false;
 	}
 
-	//TODO: add more checks
 	Tree::TreeItem* identifier = procedureIdentifierChilds.at(0)->getChilds().at(0);
 	procedureName = identifier->getStringData();
+	return true;
 }
 
-void Translator::caseBlock(Tree::TreeItem* item) {
+bool Translator::caseBlock(Tree::TreeItem* item) {
 	std::vector<Tree::TreeItem*> blockChilds = item->getChilds();
 
 	if (blockChilds.size() != 4) {
-		std::cout << "ERROR! <block> MUST have 4 childs: <variable-declarations>, BEGIN, <statement-list>, END, but got " << blockChilds.size() << std::endl;
-		return;
+		handleError("ERROR! <block> MUST have 4 childs: <variable-declarations>, BEGIN, <statement-list>, END, but got " + std::to_string(blockChilds.size()));
+		return false;
 	}
 
 	if (!caseVariableDeclarations(blockChilds.at(0))) {
-		std::cout << "ERROR! <variable-declarations> error happaned!" << std::endl;
-		return;
+		return false;
 	}
 
 	if (blockChilds.at(1)->getData() != BEGIN) {
-		std::cout << "ERROR! BEGIN expected, but got " << blockChilds.at(1)->getStringData() << std::endl;
-		return;
+		handleError("ERROR! BEGIN expected", blockChilds.at(1));
+		return false;
 	}
 	endDataSegment();
 	startCodeSegment();
-	std::cout << procedureName << " PROC" << std::endl;
 	assemblerProgram += procedureName + " PROC\n";
-	caseStatementList(blockChilds.at(2));
+	if (caseStatementList(blockChilds.at(2)) == false) {
+		return false;
+	}
 	assemblerProgram += procedureName + " ENDP\n";
-	std::cout << procedureName << " ENDP" << std::endl;
 	endCodeSegment();
-	std::cout << "END" << std::endl;
 	assemblerProgram += "END\n";
+	return true;
 }
 
 bool Translator::caseVariableDeclarations(Tree::TreeItem* item) {
 	if (item->getRule() != VARIABLE_DECLARATIONS) {
-		std::cout << "ERROR! <variable-declarations> expected, but got " << item->getRule() << std::endl;
+		handleError("ERROR! <variable-declarations> expected", item);
 		return false;
 	}
 
@@ -132,7 +151,7 @@ bool Translator::caseVariableDeclarations(Tree::TreeItem* item) {
 
 	if (variableDeclarationsChild.size() == 1) {
 		if (variableDeclarationsChild.at(0)->getRule() != Rules::EMPTY) {
-			std::cout << "ERROR! <empty> expected, but got " << variableDeclarationsChild.at(0)->getRule() << std::endl;
+			handleError("ERROR! <empty> expected", variableDeclarationsChild.at(0));
 			return false;
 		}
 		startDataSegment();
@@ -140,13 +159,12 @@ bool Translator::caseVariableDeclarations(Tree::TreeItem* item) {
 	}
 
 	if (variableDeclarationsChild.size() != 2) {
-		std::cout << "ERROR! <variable-declarations> must have only 2 childs or <empty>, but got " << variableDeclarationsChild.size() << std::endl;
+		handleError("ERROR! <variable-declarations> must have only 2 childs or <empty>, but got " + std::to_string(variableDeclarationsChild.size()));
 		return false;
 	}
 
-	// checking if 1st child of variableDeclarationsChild is VAR
 	if (variableDeclarationsChild.at(0)->getData() != VAR) {
-		std::cout << "VAR(404) expected, but got " << variableDeclarationsChild.at(0)->getData() << std::endl;
+		handleError("VAR(404) expected", variableDeclarationsChild.at(0));
 		return false;
 	}
 
@@ -160,14 +178,14 @@ bool Translator::caseVariableDeclarations(Tree::TreeItem* item) {
 
 bool Translator::caseDeclaration(Tree::TreeItem* item) {
 	if (item->getRule() != DECLARATION) {
-		std::cout << "ERROR! DECLARATION expected, but got " << item->getRule() << std::endl;
+		handleError("ERROR! DECLARATION expected", item);
 		return false;
 	}
 
 	std::vector<Tree::TreeItem*> declarationChild = item->getChilds();
 
 	if (declarationChild.size() < 4) {
-		std::cout << "ERROR! DECLARATIONS_LIST MUST have at least 4 childs, but got " << declarationChild.size() << std::endl;
+		handleError("ERROR! DECLARATIONS_LIST MUST have at least 4 childs, but got " + std::to_string(declarationChild.size()));
 		return false;
 	}
 
@@ -175,7 +193,7 @@ bool Translator::caseDeclaration(Tree::TreeItem* item) {
 	if (variable == nullptr) return false;
 
 	if (declarationChild.at(1)->getData() != COLON) {
-		std::cout << "ERROR! Expected ':'(0), but got " << declarationChild.at(1)->getStringData() << std::endl;
+		handleError("ERROR! Expected ':'(0)", declarationChild.at(1));
 		return false;
 	}
 
@@ -188,7 +206,7 @@ bool Translator::caseDeclaration(Tree::TreeItem* item) {
 	attribute = attributeList->getType() == Attribute::IdentifierType::EMPTY ? attribute : attributeList;
 
 	if (isIdentifierDeclarated(variable->getData())) {
-		std::cout << "ERROR! " << variable->getStringData() << " already declarated!" << std::endl;
+		handleError("ERROR! " + variable->getStringData() + " already declarated! (row: " + std::to_string(item->getRow()) + ", column: " + std::to_string(item->getColumn()) + ")");
 		return false;
 	}
 
@@ -201,7 +219,7 @@ bool Translator::caseDeclaration(Tree::TreeItem* item) {
 
 bool Translator::caseDeclarationList(Tree::TreeItem* item) {
 	if (item->getRule() != DECLARATIONS_LIST) {
-		std::cout << "ERROR! Expected DECLARATIONS_LIST, but got " << item->getRule() << std::endl;
+		handleError("ERROR! Expected DECLARATIONS_LIST, but got " + item->getStringData());
 		return false;
 	}
 
@@ -211,7 +229,7 @@ bool Translator::caseDeclarationList(Tree::TreeItem* item) {
 		if (declarationListChilds.at(0)->getRule() == EMPTY) {
 			return true;
 		} else {
-			std::cout << "ERROR! <declaration-list> with 1 child MUST have EMPTY child" << std::endl;
+			handleError("ERROR! <declaration-list> with 1 child MUST have EMPTY child");
 			return false;
 		}
 	}
@@ -220,14 +238,14 @@ bool Translator::caseDeclarationList(Tree::TreeItem* item) {
 		bool isDeclaration = caseDeclaration(declarationListChilds.at(0));
 		return isDeclaration ? caseDeclarationList(declarationListChilds.at(1)) : isDeclaration;
 	} else {
-		std::cout << "ERROR! <declaration-list> must have 1 or 2 childs, but got " << declarationListChilds.size() << std::endl;
+		handleError("ERROR! <declaration-list> must have 1 or 2 childs, but got " + std::to_string(declarationListChilds.size()));
 		return false;
 	}
 }
 
 bool Translator::caseStatementList(Tree::TreeItem* item) {
 	if (item->getRule() != STATEMENT_LIST) {
-		std::cout << "ERROR! Expected <statement-list>, but got " << item->getRule() << std::endl;
+		handleError("ERROR! Expected <statement-list>", item);
 		return false;
 	}
 
@@ -239,13 +257,13 @@ bool Translator::caseStatementList(Tree::TreeItem* item) {
 			assemblerProgram += "\tnop\n";
 			return true;
 		} else {
-			std::cout << "ERROR! If <statement-list> has 1 child it MUST be EMPTY, but got " << statementListChild.at(0)->getRule() << std::endl;
+			handleError("ERROR! If <statement-list> has 1 child it MUST be EMPTY", statementListChild.at(0));
 			return false;
 		}
 	}
 
 	if (statementListChild.size() != 2) {
-		std::cout << "ERROR! <statement-list> MUST have 1 or 2 childs, but got " << statementListChild.size() << std::endl;
+		handleError("ERROR! <statement-list> MUST have 1 or 2 childs, but got " + std::to_string(statementListChild.size()));
 		return false;
 	}
 	
@@ -256,14 +274,14 @@ bool Translator::caseStatementList(Tree::TreeItem* item) {
 
 bool Translator::caseStatement(Tree::TreeItem* item) {
 	if (item->getRule() != STATEMENT) {
-		std::cout << "ERROR! STATEMENT expected, but got " << item->getRule() << std::endl;
+		handleError("ERROR! STATEMENT expected", item);
 		return false;
 	}
 
 	std::vector<Tree::TreeItem*> statementChilds = item->getChilds();
 
 	if (statementChilds.size() != 4) {
-		std::cout << "ERROR! <statement-list> MUST have 4 child items, but got " << statementChilds.size() << std::endl;
+		handleError("ERROR! <statement-list> MUST have 4 child items, but got " + std::to_string(statementChilds.size()));
 		return false;
 	}
 
@@ -290,7 +308,7 @@ bool Translator::caseStatementLoop(Tree::TreeItem* item) {
 	if (isStatemntList == false) return false;
 
 	if (statementLoopChilds.at(2)->getData() != ENDLOOP) {
-		std::cout << "ERROR (line " << statementLoopChilds.at(2)->getRow() << " column " << statementLoopChilds.at(2)->getColumn() << " ! ENDLOOP expected, but got " << statementLoopChilds.at(2)->getStringData() << std::endl;
+		handleError("ERROR! ENDLOOP expected", statementLoopChilds.at(2));
 		return false;
 	}
 
@@ -311,7 +329,7 @@ bool Translator::caseStatementExpression(Tree::TreeItem* item) {
 	if (variable == nullptr) return false;
 
 	if (statementExpressionsChild.at(1)->getData() != EQUALS) {
-		std::cout << "ERROR (line " << statementExpressionsChild.at(1)->getRow() << " column " << statementExpressionsChild.at(1)->getColumn() << " !  := expected, but got " << statementExpressionsChild.at(1)->getStringData() << std::endl;
+		handleError("ERROR! ':=' expected", statementExpressionsChild.at(1));
 		return false;
 	}
 
@@ -325,24 +343,21 @@ bool Translator::caseStatementExpression(Tree::TreeItem* item) {
 			if ((expression->getDimension() == nullptr && variable->getDimension() == nullptr && left->getAttribute()->getType() != right->getAttribute()->getType())
 				|| (expression->getDimension() != nullptr && left->getAttribute()->getType() != Attribute::INTEGER)
 				|| (variable->getDimension() != nullptr && right->getAttribute()->getType() != Attribute::INTEGER)) {
-				std::cout << "ERROR(line " << variable->getLine() << " column " << variable->getColumn() << " ! " << left->getName() << " and " << right->getName() << " MUST have same type" << std::endl;
+				handleError("ERROR! " + left->getName() + " and " + right->getName() + " MUST have same type (row: " + std::to_string(variable->getLine()) + ", column: " + std::to_string(variable->getColumn()) + ")");
 				return false;
 			}
 		} else if (right == nullptr) {
 			// right is UNSIGNED_INTEGER
 			if ((left->getAttribute()->getType() == Attribute::RANGE && variable->getDimension() == nullptr) && left->getAttribute()->getType() != Attribute::INTEGER) {
-				std::cout << "ERROR(line " << variable->getLine() << " column " << variable->getColumn() << " ! " << left->getName() << " and " << expression->getName() << " MUST have same type" << std::endl;
+				handleError("ERROR! " + left->getName() + " and " + expression->getName() + " MUST have same type (row: " + std::to_string( variable->getLine()) + ", column: " + std::to_string(variable->getColumn()) + ")");
 				return false;
 			}
 		}
 	}
 
 	assemblerProgram += "\t\t; " + variable->getVariableForPrint() + " := " + expression->getVariableForPrint() + "\n";
-	std::cout << "; ";
 	variable->print();
-	std::cout << " := ";
 	expression->print();
-	std::cout << std::endl;
 	generateAsm(variable, expression);
 
 	return true;
@@ -350,14 +365,14 @@ bool Translator::caseStatementExpression(Tree::TreeItem* item) {
 
 Expression* Translator::caseExpression(Tree::TreeItem* item, bool isDimension) {
 	if (item->getRule() != EXPRESSION) {
-		std::cout << "ERROR (line " << item->getRow() << " column " << item->getColumn() << " ! EXPRESSION expected, but got " << item->getRule() << std::endl;
+		handleError("ERROR! EXPRESSION expected", item);
 		return nullptr;
 	}
 
 	std::vector<Tree::TreeItem*> expressionChilds = item->getChilds();
 
 	if (expressionChilds.size() != 1) {
-		std::cout << "ERROR! <expression> must have 1 child, but got " << expressionChilds.size() << std::endl;
+		handleError("ERROR! <expression> must have 1 child, but got " + std::to_string(expressionChilds.size()));
 		return nullptr;
 	}
 
@@ -375,14 +390,14 @@ Expression* Translator::caseExpression(Tree::TreeItem* item, bool isDimension) {
 		);
 	case VARIABLE: return caseVariable(expressionChilds.at(0), isDimension);
 	default: 
-		std::cout << "ERROR! UNSIGNED_INTEGER or VARIABLE expected, but got " << expressionChilds.at(0)->getRule() << std::endl;
+		handleError("ERROR! UNSIGNED_INTEGER or VARIABLE expected", expressionChilds.at(0));
 		return nullptr;
 	}
 }
 
 Expression* Translator::caseDimension(Tree::TreeItem* item) {
 	if (item->getRule() != DIMENSION) {
-		std::cout << "ERROR (line " << item->getRow() << " column " << item->getColumn() << " ! DIMENSION expected, but got " << item->getRule() << std::endl;
+		handleError("ERROR! DIMENSION expected", item);
 		return nullptr;
 	}
 
@@ -398,28 +413,28 @@ Expression* Translator::caseDimension(Tree::TreeItem* item) {
 				Expression::ExpressionType::EMPTY
 			);
 		} else {
-			std::cout << "ERROR! if size of <dimension> is 1 it must be EMPTY" << std::endl;
+			handleError("ERROR! if size of <dimension> is 1 it must be EMPTY", item);
 			return nullptr;
 		}
 	}
 
 	if (dimensionChilds.size() != 3) {
-		std::cout << "ERROR! <diemnsion> MUST have 1 or 3 childs, but got " << dimensionChilds.size() << std::endl;
+		handleError("ERROR! <diemnsion> MUST have 1 or 3 childs, but got " + std::to_string(dimensionChilds.size()));
 		return nullptr;
 	}
 	
 	if (dimensionChilds.at(0)->getData() != ReserverWords::LEFT_SQUARE_BRACKET) {
-		std::cout << "ERROR! '[' expected, but got " << dimensionChilds.at(1)->getStringData() << std::endl;
+		handleError("ERROR! '[' expected", dimensionChilds.at(1));
 		return nullptr;
 	}
 
 	if (dimensionChilds.at(2)->getData() != ReserverWords::RIGHT_SQUARE_BRACKET) {
-		std::cout << "ERROR! ']' expected, but got " << dimensionChilds.at(3)->getStringData() << std::endl;
+		handleError("ERROR! ']' expected, but got ", dimensionChilds.at(3));
 		return nullptr;
 	}
 
 	if (dimensionChilds.at(1)->getRule() != Rules::EXPRESSION) {
-		std::cout << "ERROR! 2-nd child of <dimension> must be EXPRESSION, but got " << dimensionChilds.at(1)->getRule() << std::endl;
+		handleError("ERROR! 2-nd child of <dimension> must be EXPRESSION, but got ", dimensionChilds.at(1));
 		return nullptr;
 	}
 
@@ -428,14 +443,14 @@ Expression* Translator::caseDimension(Tree::TreeItem* item) {
 
 Expression* Translator::caseVariable(Tree::TreeItem* item, bool onlyIntegerValues) {
 	if (item->getRule() != VARIABLE) {
-		std::cout << "ERROR (line " << item->getRow() << " column " << item->getColumn() << " ! VARIABLE expected, but got " << item->getRule() << std::endl;
+		handleError("ERROR! VARIABLE expected", item);
 		return nullptr;
 	}
 
 	std::vector<Tree::TreeItem*> variableChilds = item->getChilds();
 
 	if (variableChilds.size() < 2) {
-		std::cout << "ERROR! <variable> MUST have at least 2 childs, but got " << variableChilds.size();
+		handleError("ERROR! <variable> MUST have at least 2 childs, but got " + std::to_string(variableChilds.size()));
 		return nullptr;
 	}
 
@@ -445,13 +460,13 @@ Expression* Translator::caseVariable(Tree::TreeItem* item, bool onlyIntegerValue
 	Expression* dimension = caseDimension(variableChilds.at(1));
 	if (dimension == nullptr) return nullptr;
 	if (dimension->getType() != Expression::ExpressionType::EMPTY && !isIdentifierIsRange(variableIdentifier->getData())) {
-		std::cout << "ERROR! operator [..] can use only for RANGE type, but " << variableIdentifier->getStringData() << " is not type of range." << std::endl;
+		handleError("ERROR! operator [..] can use only for RANGE type", variableIdentifier);
 		return nullptr;
 	}
 	
 	if (dimension->getType() == Expression::ExpressionType::EMPTY) {
 		if (onlyIntegerValues && !isIdentifierIsInteger(variableIdentifier->getData())) {
-			std::cout << "ERROR! INSIDE [ ] can be only INTEGER VARIABLE, but got " << variableIdentifier->getStringData() << std::endl;
+			handleError("ERROR! INSIDE [ ] can be only INTEGER VARIABLE", variableIdentifier);
 			return nullptr;
 		}
 		return new Expression(
@@ -475,13 +490,13 @@ Expression* Translator::caseVariable(Tree::TreeItem* item, bool onlyIntegerValue
 
 Tree::TreeItem* Translator::caseVariableIdentifier(Tree::TreeItem* item, bool isIgnoreCreationCheck) {
 	if (item->getRule() != VARIABLE_IDENTIFIER) {
-		std::cout << "ERROR (line " << item->getRow() << " column " << item->getColumn() << " ! Expected VARIABLE_IDENTIFIER, but got " << item->getRule() << std::endl;
+		handleError("ERROR! Expected VARIABLE_IDENTIFIER", item);
 		return nullptr;
 	}
 
 	std::vector<Tree::TreeItem*> variableIdentifierChilds = item->getChilds();
 	if (variableIdentifierChilds.size() != 1) {
-		std::cout << "ERROR! <variable-identifier> MUST have only 1 child, but got" << variableIdentifierChilds.size() << std::endl;
+		handleError("ERROR! <variable-identifier> MUST have only 1 child, but got" + std::to_string(variableIdentifierChilds.size()));
 		return nullptr;
 	}
 
@@ -490,25 +505,25 @@ Tree::TreeItem* Translator::caseVariableIdentifier(Tree::TreeItem* item, bool is
 
 Tree::TreeItem* Translator::caseIdentifier(Tree::TreeItem* item, bool ignoreCreationCheck) {
 	if (item->getRule() != IDENTIFIER_RULE) {
-		std::cout << "ERROR (line " << item->getRow() << " column " << item->getColumn() << " ! Expected IDENTIFIER_RULE, but got " << item->getRule() << std::endl;
+		handleError("ERROR! Expected IDENTIFIER_RULE", item);
 		return nullptr;
 	}
 
 	std::vector<Tree::TreeItem*> identifierRuleChilds = item->getChilds();
 
 	if (identifierRuleChilds.size() != 1) {
-		std::cout << "ERROR! IDENTIFIER_RULE MUST have only 1 child, but got " << identifierRuleChilds.size() << std::endl;
+		handleError("ERROR! IDENTIFIER_RULE MUST have only 1 child, but got " + std::to_string(identifierRuleChilds.size()));
 		return nullptr;
 	}
 
 	Tree::TreeItem* identifier = identifierRuleChilds.at(0);
 	if (identifier->getRule() != ADDING_INDENTIFIER) {
-		std::cout << "ERROR! Expected ADDING_INDENTIFIER, but got " << identifier->getRule() << std::endl;
+		handleError("ERROR! Expected ADDING_INDENTIFIE", identifier);
 		return nullptr;
 	}
 
 	if (!ignoreCreationCheck && !isIdentifierDeclarated(identifier->getData())) {
-		std::cout << "ERROR! Identifier " << identifier->getStringData() << " IS NOT DECLARATED!" << std::endl;
+		handleError("ERROR! Identifier " + identifier->getStringData() + " IS NOT DECLARATED! (line: " + std::to_string(identifier->getRow()) + ", column: " + std::to_string(identifier->getColumn()) + ")");
 		return nullptr;
 	}
 
@@ -517,7 +532,7 @@ Tree::TreeItem* Translator::caseIdentifier(Tree::TreeItem* item, bool ignoreCrea
 
 Attribute* Translator::caseAttribtue(Tree::TreeItem* item) {
 	if (item->getRule() != ATTRIBUTE) {
-		std::cout << "ERROR (line " << item->getRow() << " column " << item->getColumn() << " ! ATTRIBUTE expected, but got " << item->getRule() << std::endl;
+		handleError("ERROR! Expected ATTRIBUTE", item);
 		return nullptr;
 	}
 
@@ -529,13 +544,13 @@ Attribute* Translator::caseAttribtue(Tree::TreeItem* item) {
 		} else if (attributeChilds.at(0)->getData() == INTEGER) {
 			return new Attribute(Attribute::IdentifierType::INTEGER);
 		} else {
-			std::cout << "ERROR! <attribute> with 1 child must have INTEGER or FLOAT as chold, but got " << attributeChilds.at(0)->getRule() << std::endl;
+			handleError("ERROR! INTEGER or FLOAT expected", attributeChilds.at(0));
 			return nullptr;
 		}
 	}
 
 	if (attributeChilds.size() != 3) {
-		std::cout << "ERROR! <attribute> MUST have 1 or 3 childs, but got " << attributeChilds.size() << std::endl;
+		handleError("ERROR! <attribute> MUST have 1 or 3 childs, but got " + std::to_string(attributeChilds.size()));
 		return nullptr;
 	}
 	
@@ -544,7 +559,7 @@ Attribute* Translator::caseAttribtue(Tree::TreeItem* item) {
 
 Attribute* Translator::caseAttributeList(Tree::TreeItem* item) {
 	if (item->getRule() != ATTRIBUTES_LIST) {
-		std::cout << "ERROR (line " << item->getRow() << " column " << item->getColumn() << " ! <attribute-list> expected, but got " << item->getRule() << std::endl;
+		handleError("ERROR! <attribute-list> expected", item);
 		return nullptr;
 	}
 
@@ -554,13 +569,13 @@ Attribute* Translator::caseAttributeList(Tree::TreeItem* item) {
 		if (attributeListChilds.at(0)->getRule() == EMPTY) {
 			return new Attribute(Attribute::IdentifierType::EMPTY);
 		} else {
-			std::cout << "ERROR! <attribute-list> with childs count 1 MUST have only EMPTY child" << std::endl;
+			handleError("ERROR! <attribute-list> with childs count 1 MUST have only EMPTY child, but got " + std::to_string(attributeListChilds.size()));
 			return nullptr;
 		}
 	}
 
 	if (attributeListChilds.size() != 2) {
-		std::cout << "ERROR! <attribute-list> MUST contains 2 childs" << std::endl;
+		handleError("ERROR!  <attribute-list> MUST contains 2 childs, but got " + std::to_string(attributeListChilds.size()));
 		return nullptr;
 	}
 
@@ -574,13 +589,13 @@ Attribute* Translator::caseAttributeList(Tree::TreeItem* item) {
 
 RangeAttribute* Translator::caseRange(Tree::TreeItem* item) {
 	if (item->getRule() != RANGE) {
-		std::cout << "ERROR (line " << item->getRow() << " column " << item->getColumn() << " ! Eexpected RANGE, but got " << item->getRule() << std::endl;
+		handleError("ERROR! RANGE expected", item);
 		return nullptr;
 	}
 
 	std::vector<Tree::TreeItem*> rangeChilds = item->getChilds();
 	if (rangeChilds.size() != 3) {
-		std::cout << "ERROR! <range> MUST have 3 childs, but got " << rangeChilds.size() << std::endl;
+		handleError("ERROR!  <range> MUST have 3 childs, but got " + std::to_string(rangeChilds.size()));
 		return nullptr;
 	}
 
@@ -589,7 +604,7 @@ RangeAttribute* Translator::caseRange(Tree::TreeItem* item) {
 
 	Tree::TreeItem* divider = rangeChilds.at(1);
 	if (divider->getData() != DOUBLE_DOT) {
-		std::cout << "ERROR(line " << divider->getRow() << " column " << divider->getColumn() << " ! Expected .., but got " << divider->getStringData() << std::endl;
+		handleError("ERROR! Expexted '..'", divider);
 		return nullptr;
 	}
 
@@ -602,20 +617,20 @@ RangeAttribute* Translator::caseRange(Tree::TreeItem* item) {
 
 Tree::TreeItem* Translator::caseUnsignedInteger(Tree::TreeItem* item) {
 	if (item->getRule() != UNSIGNED_INTEGER) {
-		std::cout << "ERROR (line " << item->getRow() << " column " << item->getColumn() << " ! Expected UNSIGNED_INTEGER, but got " << item->getRule() << std::endl;
+		handleError("ERROR! Expected UNSIGNED_INTEGER", item);
 		return nullptr;
 	}
 
 	std::vector<Tree::TreeItem*> unsignedIntegerChilds = item->getChilds();
 
 	if (unsignedIntegerChilds.size() != 1) {
-		std::cout << "ERROR! <unsigned-integer> MUST have 1 child, but got " << unsignedIntegerChilds.size() << std::endl;
+		handleError("ERROR! <unsigned-integer> MUST have 1 child, but got " + std::to_string(unsignedIntegerChilds.size()));
 		return nullptr;
 	}
 
 	Tree::TreeItem* integer = unsignedIntegerChilds.at(0);
 	if (integer->getRule() != ADDING_CONSTANT) {
-		std::cout << "ERROR (line " << integer->getRow() << " column " << integer->getColumn() << " ! Expected CONSTANT, but got " << integer->getRule() << std::endl;
+		handleError("Expected CONSTANT", integer);
 		return nullptr;
 	}
 
@@ -699,7 +714,11 @@ std::string Translator::generatePrepareRightExpression(Expression* expression, b
 void Translator::dumpIntoFile(std::string filePath) {
 	std::ofstream file;
 	file.open(filePath);
-	file << assemblerProgram << std::endl;
+	if (errorHappened) {
+		file << errorString << std::endl;
+	} else {
+		file << assemblerProgram << std::endl;
+	}
 	file.close();
 }
 

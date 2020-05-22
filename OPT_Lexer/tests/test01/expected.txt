@@ -193,7 +193,20 @@
 (28)****************************] 3
 (22)**********************; 1
 (20)********************<statements-list> --> <statement> <statements-list> | <empty>
-(22)**********************<empty>
+(22)**********************<statement> --> <variable> := <expression> ; | LOOP <statements-list> ENDLOOP;
+(24)************************<variable> --> <variable-identifier><dimension>
+(26)**************************<variable-identifier> --> <identifier>
+(28)****************************<identifier> --> <letter><string>
+(30)******************************K 1005
+(26)**************************<dimension> --> [ <expression> ] | <empty>
+(28)****************************<empty>
+(24)************************:= 301
+(24)************************<expression> --> <variable> | <unsigned-integer>
+(26)**************************<unsigned-integer>
+(28)****************************1 503
+(24)************************; 1
+(22)**********************<statements-list> --> <statement> <statements-list> | <empty>
+(24)************************<empty>
 (14)**************ENDLOOP 407
 (14)**************; 1
 (12)************<statements-list> --> <statement> <statements-list> | <empty>
