@@ -1,0 +1,19 @@
+DATA SEGMENT
+	A dw ?
+	C dw 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+DATA ENDS
+CODE SEGMENT
+ASSUME CS:CODE, DS:DATA
+PR PROC
+		; C[0] := A
+	MOV BX, 0
+	MOV BP, A
+	MOV C[BX], BP
+		; A := 0
+	MOV BP, 0
+	MOV A, BP
+	nop
+PR ENDP
+CODE ENDS
+END
+
