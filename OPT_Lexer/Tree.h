@@ -114,14 +114,14 @@ public:
 		DON'T modify the lastModified
 		return pointer to added item
 	*/
-	TreeItem* addChild(std::string, int, int, Rules, int);
+	TreeItem* addChild(std::string, Rules);
 	TreeItem* addChild(LexerResult*, Rules);
 
 	/*	add next to lastModified 
 		lastModified become added TreeItem 
 		return pointer to added item
 	*/
-	TreeItem* addNext(std::string, int, int, Rules, int);
+	TreeItem* addNext(std::string, Rules);
 	TreeItem* addNext(LexerResult*, Rules);
 
 	TreeItem* getCurrent();

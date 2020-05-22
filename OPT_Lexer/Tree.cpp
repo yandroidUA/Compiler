@@ -5,17 +5,17 @@ Tree::Tree() {
 	this->lastModified = nullptr;
 }
 
-Tree::TreeItem* Tree::addChild(std::string data, int row, int column, Rules rules, int value) {
-	return add(data, row, column, rules, value, false);
+Tree::TreeItem* Tree::addChild(std::string data, Rules rules) {
+	return add(data, -1, -1, rules, -1, false);
 }
 
 Tree::TreeItem* Tree::addChild(LexerResult* dat, Rules rul) {
 	std::string token = dat->getToken();
-	return add(token, dat->getRowNumber(), dat->getRowNumber(), rul, dat->getCode(), false);
+	return add(token, dat->getRowNumber(), dat->getColumnNumber(), rul, dat->getCode(), false);
 }
 
-Tree::TreeItem* Tree::addNext(std::string data, int row, int column, Rules rules, int value) {
-	return add(data, row, column, rules, value, true);
+Tree::TreeItem* Tree::addNext(std::string data, Rules rules) {
+	return add(data, -1, -1, rules, -1, true);
 }
 
 Tree::TreeItem* Tree::addNext(LexerResult* lexerResult, Rules rule) {

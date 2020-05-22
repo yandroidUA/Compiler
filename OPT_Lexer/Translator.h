@@ -18,8 +18,16 @@ private:
 	Tree* tree;
 	int loopLabelCounter = 0;
 	std::string assemblerProgram = "";
+	std::string errorString = "";
+	bool errorHappened = false;
 	std::string procedureName;
 	std::vector<Identifier> declaratedIdentifiers;
+
+	// Print error into console and set errorHappened to TRUE
+	void handleError(std::string);
+
+	// same as handleError, but add information about position and value
+	void handleError(std::string, Tree::TreeItem*);
 
 	// check if identififer with code param is contains in declaratedIdentifiers
 	bool isIdentifierDeclarated(int);
@@ -46,11 +54,11 @@ private:
 	// end CODE SEGMENT
 	void endCodeSegment();
 
-	void caseProgram(Tree::TreeItem*);
+	bool caseProgram(Tree::TreeItem*);
 
-	void caseProcedureIdentifier(Tree::TreeItem*);
+	bool caseProcedureIdentifier(Tree::TreeItem*);
 
-	void caseBlock(Tree::TreeItem*);
+	bool caseBlock(Tree::TreeItem*);
 
 	bool caseVariableDeclarations(Tree::TreeItem*);
 

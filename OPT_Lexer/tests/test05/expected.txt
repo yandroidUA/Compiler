@@ -4,7 +4,7 @@
 (2)**<program> --> PROGRAM <procedure-identifier>;< block > .
 (4)****<procedure-identifier> --> <identifier>
 (6)******<identifier> --> <letter><string>
-(8)********PR 1017
+(8)********PR 1018
 (4)****<block> --> <variable-declarations> BEGIN <statements-list> END
 (6)******<variable-declarations> --> VAR <declarations-list>|<empty>
 (8)********VAR 404

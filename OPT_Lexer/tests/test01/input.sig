@@ -12,6 +12,7 @@ BEGIN
 			A:=C[1];
 		ENDLOOP;
 		A:=C[1];
+		K:=1;
 	ENDLOOP;
 	A:=C[11];
 END.

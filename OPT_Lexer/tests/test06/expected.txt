@@ -4,7 +4,7 @@
 (2)**<program> --> PROGRAM <procedure-identifier>;< block > .
 (4)****<procedure-identifier> --> <identifier>
 (6)******<identifier> --> <letter><string>
-(8)********PR 1018
+(8)********PR 1019
 (4)****<block> --> <variable-declarations> BEGIN <statements-list> END
 (6)******<variable-declarations> --> VAR <declarations-list>|<empty>
 (8)********VAR 404
@@ -12,7 +12,7 @@
 (10)**********<declaration> --><variable-identifier>:<attribute><attributes-list>;
 (12)************<variable-identifier> --> <identifier>
 (14)**************<identifier> --> <letter><string>
-(16)****************A 1019
+(16)****************A 1020
 (12)************: 0
 (12)************< attribute > -- > INTEGER | FLOAT | [<range>]
 (14)**************INTEGER 408
@@ -22,7 +22,7 @@
 (12)************<declaration> --><variable-identifier>:<attribute><attributes-list>;
 (14)**************<variable-identifier> --> <identifier>
 (16)****************<identifier> --> <letter><string>
-(18)******************B 1020
+(18)******************B 1021
 (14)**************: 0
 (14)**************< attribute > -- > INTEGER | FLOAT | [<range>]
 (16)****************FLOAT 405
@@ -32,7 +32,7 @@
 (14)**************<declaration> --><variable-identifier>:<attribute><attributes-list>;
 (16)****************<variable-identifier> --> <identifier>
 (18)******************<identifier> --> <letter><string>
-(20)********************C 1021
+(20)********************C 1022
 (16)****************: 0
 (16)****************< attribute > -- > INTEGER | FLOAT | [<range>]
 (18)******************[ 2
@@ -53,7 +53,7 @@
 (10)**********<variable> --> <variable-identifier><dimension>
 (12)************<variable-identifier> --> <identifier>
 (14)**************<identifier> --> <letter><string>
-(16)****************C 1021
+(16)****************C 1022
 (12)************<dimension> --> [ <expression> ] | <empty>
 (14)**************[ 2
 (14)**************<expression> --> <variable> | <unsigned-integer>
@@ -73,7 +73,7 @@
 (16)****************<variable> --> <variable-identifier><dimension>
 (18)******************<variable-identifier> --> <identifier>
 (20)********************<identifier> --> <letter><string>
-(22)**********************A 1019
+(22)**********************A 1020
 (18)******************<dimension> --> [ <expression> ] | <empty>
 (20)********************<empty>
 (16)****************:= 301
@@ -81,7 +81,7 @@
 (18)******************<variable> --> <variable-identifier><dimension>
 (20)********************<variable-identifier> --> <identifier>
 (22)**********************<identifier> --> <letter><string>
-(24)************************C 1021
+(24)************************C 1022
 (20)********************<dimension> --> [ <expression> ] | <empty>
 (22)**********************[ 2
 (22)**********************<expression> --> <variable> | <unsigned-integer>

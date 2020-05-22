@@ -10,7 +10,7 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<LexerResult>& res) {
 }
 
 void SyntaxAnalyzer::analyze(){  
-	tree.addChild("<signal-program> --> <program>", -1, -1, SIGNAL_PROGRAM, -1);
+	tree.addChild("<signal-program> --> <program>", SIGNAL_PROGRAM);
 	caseProgram();
 		// tree.print();
 	tree.print();
@@ -57,7 +57,7 @@ void SyntaxAnalyzer::handleError(const char* message, LexerResult* failedItem) {
 
 // 2. < program > --> PROGRAM <procedure - identifier>;
 bool SyntaxAnalyzer::caseProgram() {
-	Tree::TreeItem* it = tree.addNext("<program> --> PROGRAM <procedure-identifier>;< block > .", -1, -1, PROGRAM_RULE, -1);
+	Tree::TreeItem* it = tree.addNext("<program> --> PROGRAM <procedure-identifier>;< block > .", PROGRAM_RULE);
 	
 	LexerResult* item = getItem(0);
 
@@ -66,7 +66,7 @@ bool SyntaxAnalyzer::caseProgram() {
 		return false;
 	}
 
-	tree.addNext("<procedure-identifier> --> <identifier>", -1, -1, PROCEDURE_IDENTIFIER, -1);
+	tree.addNext("<procedure-identifier> --> <identifier>", PROCEDURE_IDENTIFIER);
 	item = getItem(item->getIndexInResultVector() + 1);
 
 	bool isIdentifier = caseIdentifier(item);
@@ -83,7 +83,7 @@ bool SyntaxAnalyzer::caseProgram() {
 		return false;
 	}
 
-	tree.addNext("<block> --> <variable-declarations> BEGIN <statements-list> END", -1, -1, BLOCK, -1);
+	tree.addNext("<block> --> <variable-declarations> BEGIN <statements-list> END", BLOCK);
 	return caseBlock(item->getIndexInResultVector() + 1) != nullptr;
 }
 
@@ -120,11 +120,11 @@ LexerResult* SyntaxAnalyzer::caseBlock(int index) {
 LexerResult* SyntaxAnalyzer::caseVariableDeclarations(int index) {
 	Tree::TreeItem* it = tree.getCurrent();
 
-	tree.addNext("<variable-declarations> --> VAR <declarations-list>|<empty>", -1, -1, VARIABLE_DECLARATIONS, -1);
+	tree.addNext("<variable-declarations> --> VAR <declarations-list>|<empty>", VARIABLE_DECLARATIONS);
 	LexerResult* item = getItem(index);
 
 	if (item->getCode() != VAR) {
-		tree.addChild("<empty>", -1, -1, EMPTY, -1);
+		tree.addChild("<empty>", EMPTY);
 		return item;
 	}
 
@@ -134,13 +134,13 @@ LexerResult* SyntaxAnalyzer::caseVariableDeclarations(int index) {
 
 // 5. <declarations-list> --> <declaration><declarations-list>|<empty>
 LexerResult* SyntaxAnalyzer::caseDeclarationList(int index) {
-	tree.addNext("<declarations-list> --> <declaration><declarations-list>|<empty>", -1, -1, DECLARATIONS_LIST, -1);
+	tree.addNext("<declarations-list> --> <declaration><declarations-list>|<empty>", DECLARATIONS_LIST);
 	Tree::TreeItem* it = tree.getCurrent();
 
 	std::pair<LexerResult*, bool> declarationParsingResult = caseDeclaration(index);
 	if (declarationParsingResult.second) {
 		tree.switchTo(it);
-		tree.addChild("<empty>", -1, -1, EMPTY, -1);
+		tree.addChild("<empty>", EMPTY);
 		return declarationParsingResult.first;
 	}
 
@@ -157,7 +157,7 @@ std::pair<LexerResult*, bool> SyntaxAnalyzer::caseDeclaration(int index) {
 
 
 	bool isIdentifier = caseVariableIdentifier(item, [&]() {
-		it = tree.addNext("<declaration> --><variable-identifier>:<attribute><attributes-list>;", -1, -1, DECLARATION, -1);
+		it = tree.addNext("<declaration> --><variable-identifier>:<attribute><attributes-list>;", DECLARATION);
 	});
 
 	if (!isIdentifier) {
@@ -205,7 +205,7 @@ std::pair<LexerResult*, bool> SyntaxAnalyzer::caseDeclaration(int index) {
 
 // 7. <attributes-list> --> <attribute> <attributes-list>; | <empty>
 LexerResult* SyntaxAnalyzer::caseAttributeList(int index) {
-	tree.addNext("<attributes-list> --> <attribute> <attributes-list> | <empty>", -1, -1, ATTRIBUTES_LIST, -1);
+	tree.addNext("<attributes-list> --> <attribute> <attributes-list> | <empty>", ATTRIBUTES_LIST);
 	Tree::TreeItem* it = tree.getCurrent();
 
 	std::pair<LexerResult*, bool> attributeParseResult = caseAttribute(index);
@@ -217,7 +217,7 @@ LexerResult* SyntaxAnalyzer::caseAttributeList(int index) {
 
 	if (attributeParseResult.second) {
 		tree.switchTo(it);
-		tree.addChild("<empty>", -1, -1, EMPTY, -1);
+		tree.addChild("<empty>", EMPTY);
 		return getItem(attributeParseResult.first->getIndexInResultVector());
 	}
 
@@ -230,13 +230,13 @@ std::pair<LexerResult*, bool> SyntaxAnalyzer::caseAttribute(int index) {
 	LexerResult* item = getItem(index);
 
 	if (item->getCode() == INTEGER || item->getCode() == FLOAT) {
-		tree.addNext("< attribute > -- > INTEGER | FLOAT | [<range>]", -1, -1, ATTRIBUTE, -1);
+		tree.addNext("< attribute > -- > INTEGER | FLOAT | [<range>]", ATTRIBUTE);
 		tree.addChild(item, ADDING_RESERVED_WORD);
 		return std::make_pair(getItem(item->getIndexInResultVector() + 1), false);
 	}
 
 	if (item->getCode() == LEFT_SQUARE_BRACKET) {
-		tree.addNext("< attribute > -- > INTEGER | FLOAT | [<range>]", -1, -1, ATTRIBUTE, -1);
+		tree.addNext("< attribute > -- > INTEGER | FLOAT | [<range>]", ATTRIBUTE);
 		tree.addChild(item, RANGE_SEPARATED_SYMBOL);
 		Tree::TreeItem* it = tree.getCurrent();
 
@@ -260,7 +260,7 @@ std::pair<LexerResult*, bool> SyntaxAnalyzer::caseAttribute(int index) {
 
 // 9. <range> --> <unsigned-integer> .. <unsigned-integer>
 LexerResult* SyntaxAnalyzer::caseRange(int index) {
-	tree.addNext("<range> --> <unsigned-integer> .. <unsigned-integer>", -1, -1, RANGE, -1);
+	tree.addNext("<range> --> <unsigned-integer> .. <unsigned-integer>", RANGE);
 	Tree::TreeItem* it = tree.getCurrent();
 
 	LexerResult* item = getItem(index);
@@ -270,7 +270,7 @@ LexerResult* SyntaxAnalyzer::caseRange(int index) {
 		return nullptr;
 	}
 
-	tree.addNext("<unsigned-integer>", -1, -1, UNSIGNED_INTEGER, -1);
+	tree.addNext("<unsigned-integer>", UNSIGNED_INTEGER);
 	tree.addChild(item, ADDING_CONSTANT);
 	tree.switchTo(it);
 
@@ -288,7 +288,7 @@ LexerResult* SyntaxAnalyzer::caseRange(int index) {
 		return nullptr;
 	}
 
-	tree.addNext("<unsigned-integer>",-1, -1, UNSIGNED_INTEGER, -1);
+	tree.addNext("<unsigned-integer>", UNSIGNED_INTEGER);
 	tree.addChild(item, ADDING_CONSTANT);
 	tree.switchTo(it);
 
@@ -297,13 +297,13 @@ LexerResult* SyntaxAnalyzer::caseRange(int index) {
 
 // 10. <statements-list> --> <statement> <statements-list> | <empty>
 LexerResult* SyntaxAnalyzer::caseStatementList(int index) {
-	tree.addNext("<statements-list> --> <statement> <statements-list> | <empty>", -1, -1, STATEMENT_LIST, -1);
+	tree.addNext("<statements-list> --> <statement> <statements-list> | <empty>", STATEMENT_LIST);
 	Tree::TreeItem* it = tree.getCurrent();
 
 	std::pair<LexerResult*, bool> statementParseResult = caseStatement(index);
 	tree.switchTo(it);
 	if (statementParseResult.second) {
-		tree.addChild("<empty>", -1, -1, EMPTY, -1);
+		tree.addChild("<empty>", EMPTY);
 		return statementParseResult.first;
 	}
 
@@ -317,7 +317,7 @@ std::pair<LexerResult*, bool> SyntaxAnalyzer::caseStatement(int index) {
 	 Tree::TreeItem* current = nullptr;
 
 	 if (item->getCode() >= 1001) {
-		 tree.addNext("<statement> --> <variable> := <expression> ; | LOOP <statements-list> ENDLOOP;", -1, -1, STATEMENT, -1);
+		 tree.addNext("<statement> --> <variable> := <expression> ; | LOOP <statements-list> ENDLOOP;", STATEMENT);
 		 current = tree.getCurrent();
 
 		 item = caseVariable(item->getIndexInResultVector());
@@ -334,7 +334,7 @@ std::pair<LexerResult*, bool> SyntaxAnalyzer::caseStatement(int index) {
 		 if (item == nullptr) return std::make_pair(item, false);
 		 // LOOP
 	 } else if (item->getCode() == LOOP) {
-		tree.addNext("<statement> --> <variable> := <expression> ; | LOOP <statements-list> ENDLOOP;", -1, -1, STATEMENT, -1);
+		tree.addNext("<statement> --> <variable> := <expression> ; | LOOP <statements-list> ENDLOOP;", STATEMENT);
 		 current = tree.getCurrent();
 
 		 tree.addChild(item, ADDING_RESERVED_WORD);
@@ -369,11 +369,11 @@ std::pair<LexerResult*, bool> SyntaxAnalyzer::caseStatement(int index) {
 
 // 12. <expression> --> <variable> | <unsigned-integer>
 LexerResult* SyntaxAnalyzer::caseExpression(int index) {
-	tree.addNext("<expression> --> <variable> | <unsigned-integer>", -1, -1, EXPRESSION, -1);
+	tree.addNext("<expression> --> <variable> | <unsigned-integer>", EXPRESSION);
 	LexerResult* item = getItem(index);
 
 	if (item->getCode() >= 501 && item->getCode() < 1001) {
-		tree.addNext("<unsigned-integer>", -1, -1, UNSIGNED_INTEGER, -1);
+		tree.addNext("<unsigned-integer>", UNSIGNED_INTEGER);
 		tree.addChild(item, ADDING_CONSTANT);
 		return getItem(item->getIndexInResultVector() + 1);
 	}
@@ -384,7 +384,7 @@ LexerResult* SyntaxAnalyzer::caseExpression(int index) {
 // 13. <variable> --> <variable-identifier><dimension>
 LexerResult* SyntaxAnalyzer::caseVariable(int index) {
 	Tree::TreeItem* cur = tree.getCurrent();
-	Tree::TreeItem* it = tree.addNext("<variable> --> <variable-identifier><dimension>", -1, -1, VARIABLE, -1);
+	Tree::TreeItem* it = tree.addNext("<variable> --> <variable-identifier><dimension>", VARIABLE);
 	LexerResult* item = getItem(index);
 
 	bool isVariableIdentifierParsed = caseVariableIdentifier(item);
@@ -404,20 +404,20 @@ bool SyntaxAnalyzer::caseVariableIdentifier(LexerResult* item, std::function<voi
 		if (callback != nullptr) {
 			callback();
 		}
-		tree.addNext("<variable-identifier> --> <identifier>", -1, -1, VARIABLE_IDENTIFIER, -1);
-		tree.addNext("<identifier> --> <letter><string>", -1, -1, IDENTIFIER_RULE, -1);
+		tree.addNext("<variable-identifier> --> <identifier>", VARIABLE_IDENTIFIER);
+		tree.addNext("<identifier> --> <letter><string>", IDENTIFIER_RULE);
 		tree.addChild(item, ADDING_INDENTIFIER);
 	});
 }
 
 // 14. <dimension> --> [ <expression> ] | <empty>
 LexerResult* SyntaxAnalyzer::caseDimension(int index) {
-	tree.addNext("<dimension> --> [ <expression> ] | <empty>", -1, -1, DIMENSION, -1);
+	tree.addNext("<dimension> --> [ <expression> ] | <empty>", DIMENSION);
 	Tree::TreeItem* it = tree.getCurrent();
 	LexerResult* item = getItem(index);
 
 	if (item->getCode() != LEFT_SQUARE_BRACKET) {
-		tree.addChild("<empty>", -1, -1, EMPTY, -1);
+		tree.addChild("<empty>", EMPTY);
 		return item;
 	}
 
@@ -440,7 +440,7 @@ LexerResult* SyntaxAnalyzer::caseDimension(int index) {
 bool SyntaxAnalyzer::caseIdentifier(LexerResult* item, std::function<void(LexerResult*)> callback) {
 	if (item->getCode() >= 1001) {
 		if (callback == nullptr) {
-			tree.addNext("<identifier> --> <letter><string>", -1, -1, IDENTIFIER_RULE, -1);
+			tree.addNext("<identifier> --> <letter><string>", IDENTIFIER_RULE);
 			tree.addChild(item, ADDING_INDENTIFIER);
 		} else {
 			callback(item);
